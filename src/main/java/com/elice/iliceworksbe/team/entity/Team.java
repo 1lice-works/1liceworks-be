@@ -22,4 +22,12 @@ public class Team extends BaseEntity {
     @Column(name = "team_id", nullable = false)
     private Long id;
 
+    @Column(name = "team_name")
+    private String teamName;
+
+    @Column(name = "domain_name")
+    private String domainName;
+
+    @Column(name = "account_id", nullable = false)
+    private String accountId;
 }
