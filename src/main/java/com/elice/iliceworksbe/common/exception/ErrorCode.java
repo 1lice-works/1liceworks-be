@@ -1,6 +1,6 @@
 package com.elice.iliceworksbe.common.exception;
 
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +15,8 @@ public enum ErrorCode {
      * 200 : 요청 성공
      */
     SUCCESS(true, HttpStatus.OK.value(), "요청 성공"),
+    NO_CONTENT(true, HttpStatus.NO_CONTENT.value(), "요청 성공 (no content)"),
+    CREATED(true, HttpStatus.CREATED.value(), "요청 성공 (created)"),
 
 
     /**
@@ -36,7 +38,7 @@ public enum ErrorCode {
     INVALID_USER_JWT(false,HttpStatus.FORBIDDEN.value(),"권한이 없는 유저의 접근입니다."),
     NOT_FIND_USER(false,HttpStatus.NOT_FOUND.value(),"일치하는 유저가 없습니다."),
 
-
+    USER_TYPE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 유저 타입이 없습니다."),
     /**
      * 500 :  Database, Server 오류
      */

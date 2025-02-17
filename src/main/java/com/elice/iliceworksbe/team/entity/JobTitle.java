@@ -15,7 +15,7 @@ import org.hibernate.envers.AuditOverride;
 @AllArgsConstructor
 @Table(name = "JOB_TITLE")
 @AuditOverride(forClass = BaseEntity.class)
-public class JobTitle {
+public class JobTitle extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
