@@ -1,6 +1,8 @@
 package com.elice.iliceworksbe.team.entity;
 
 import com.elice.iliceworksbe.common.entity.BaseEntity;
+import com.elice.iliceworksbe.team.dto.userType.UserTypeResponseDto;
+import com.elice.iliceworksbe.team.dto.userType.UserTypeUpdateDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +17,7 @@ import org.hibernate.envers.AuditOverride;
 @AllArgsConstructor
 @Table(name = "USER_TYPE")
 @AuditOverride(forClass = BaseEntity.class)
-public class UserType {
+public class UserType extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +26,16 @@ public class UserType {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    public void update(UserTypeUpdateDto userTypeUpdateDto) {
+        this.name = userTypeUpdateDto.getName();
+    }
+
+    public UserTypeResponseDto from() {
+        return UserTypeResponseDto
+                .builder()
+                .id(this.getId())
+                .name(this.getName())
+                .build();
+    }
 }
