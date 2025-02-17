@@ -17,11 +17,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserTypeServiceImpl implements UserTypeService{
+
     private final UserTypeRepository userTypeRepository;
 
     @Override
     public UserTypeResponseDto postUserType(UserTypeRequestDto userTypeRequestDto) {
-        UserType savedUserType = userTypeRepository.save(userTypeRequestDto.from());
+        UserType savedUserType = userTypeRepository.save(UserType.from(userTypeRequestDto));
         return UserTypeResponseDto.from(savedUserType);
     }
 
