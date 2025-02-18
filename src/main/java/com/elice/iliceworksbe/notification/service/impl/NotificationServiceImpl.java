@@ -1,13 +1,26 @@
 package com.elice.iliceworksbe.notification.service.impl;
 
 
+import com.elice.iliceworksbe.auth.entity.User;
+import com.elice.iliceworksbe.auth.repository.UserRepository;
+import com.elice.iliceworksbe.calendar.entity.Event;
+import com.elice.iliceworksbe.calendar.repository.EventRepository;
+import com.elice.iliceworksbe.common.exception.BaseException;
+import com.elice.iliceworksbe.common.exception.ErrorCode;
+import com.elice.iliceworksbe.notification.dto.request.EventNotificationRequestDto;
+import com.elice.iliceworksbe.notification.dto.response.EventNotificationResponseDto;
+import com.elice.iliceworksbe.notification.entity.EventNotification;
+import com.elice.iliceworksbe.notification.repository.NotificationRepository;
 import com.elice.iliceworksbe.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,6 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+    private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
 
     /**
      * SSE 연결
@@ -58,4 +74,17 @@ public class NotificationServiceImpl implements NotificationService {
 
         });
     }
+
+    @Override
+    public EventNotificationResponseDto createEventNotification(EventNotificationRequestDto requestDto) {
+        User user = userRepository.findByAccountId(requestDto.username())
+                .orElseThrow(() -> new BaseException(ErrorCode.USERS_INFO_UNKNOWN));
+
+        Event event = eventRepository.findById(requestDto.eventId())
+                .orElseThrow(() -> new BaseException(ErrorCode.EVENT_NOT_FOUND));
+
+        EventNotification savedNotification = notificationRepository.save(EventNotification.from(requestDto, user, event));
+        return EventNotificationResponseDto.from(savedNotification);
+    }
+    
 }

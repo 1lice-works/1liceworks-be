@@ -1,17 +1,21 @@
 package com.elice.iliceworksbe.notification.web;
 
 
+import com.elice.iliceworksbe.calendar.entity.Event;
+import com.elice.iliceworksbe.calendar.repository.EventRepository;
 import com.elice.iliceworksbe.common.exception.BaseException;
 import com.elice.iliceworksbe.common.exception.ErrorCode;
+import com.elice.iliceworksbe.notification.dto.request.EventNotificationRequestDto;
+import com.elice.iliceworksbe.notification.dto.response.EventNotificationResponseDto;
 import com.elice.iliceworksbe.notification.service.impl.NotificationServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
@@ -31,5 +35,16 @@ public class NotificationController {
         String username = userDetails.getUsername();
         log.info("SSE 구독 요청: username={}", username);
         return notificationService.createEmitter(username); // SseEmitter를 반환
+    }
+
+    @PostMapping("test")
+    public ResponseEntity<EventNotificationResponseDto> createEventNotification(
+            @RequestBody EventNotificationRequestDto requestDto) {
+
+        log.info("test");
+        // 알림 생성
+        EventNotificationResponseDto response = notificationService.createEventNotification(requestDto);
+        log.info("test");
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
