@@ -47,7 +47,7 @@ deploy:
   tags:
     - all
   script:
-    - export $DISCORD_WEBHOOK_1LICEWORKS_URL
+    - echo "DISCORD_WEBHOOK_1LICEWORKS_URL=$DISCORD_WEBHOOK_1LICEWORKS_URL" >> .env
     - echo "cicd script running..."
     - sh deploy.sh
   only:
