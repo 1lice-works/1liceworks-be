@@ -25,6 +25,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -142,4 +143,20 @@ public class NotificationServiceImpl implements NotificationService {
         return EventNotificationResponseDto.from(savedNotification);
     }
 
+    /**
+     * 알림 조회 기능
+     * @param userId
+     * @return
+     */
+    @Override
+    @Transactional
+    public List<EventNotificationResponseDto> getNotification(Long userId) {
+        //DB에서 isRead = false인 알림 업데이트
+        notificationRepository.markAllAsReadByUserId(userId);
+
+        return notificationRepository.findByUserId(userId)
+                .stream()
+                .map(EventNotificationResponseDto::from)
+                .collect(Collectors.toList());
+    }
 }
