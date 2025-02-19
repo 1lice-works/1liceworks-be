@@ -12,4 +12,5 @@ public interface NotificationService {
     void checkAndSendScheduledNotification();
     EventNotificationResponseDto postEventNotification(EventNotificationRequestDto eventNotificationRequestDto);
     List<EventNotificationResponseDto> getNotification(Long userId);
+    void deleteNotification(Long notificationId);
 }

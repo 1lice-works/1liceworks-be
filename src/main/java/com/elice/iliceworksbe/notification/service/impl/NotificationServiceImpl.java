@@ -159,4 +159,9 @@ public class NotificationServiceImpl implements NotificationService {
                 .map(EventNotificationResponseDto::from)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteNotification(Long notificationId) {
+        notificationRepository.deleteById(notificationId);
+    }
 }
