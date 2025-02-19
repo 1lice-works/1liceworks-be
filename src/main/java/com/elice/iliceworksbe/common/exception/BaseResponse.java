@@ -31,5 +31,11 @@ public class BaseResponse<T> {
         this.message = status.getMessage();
         this.code = status.getCode();
     }
+
+    public BaseResponse(ErrorCode status, String validMessage) {
+        this.isSuccess = status.isSuccess();
+        this.message = validMessage != null && !validMessage.isEmpty() ? validMessage : status.getMessage();
+        this.code = status.getCode();
+    }
 }
 

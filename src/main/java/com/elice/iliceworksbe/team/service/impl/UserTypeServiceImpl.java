@@ -10,7 +10,9 @@ import com.elice.iliceworksbe.team.repository.UserTypeRepository;
 import com.elice.iliceworksbe.team.service.UserTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +22,7 @@ public class UserTypeServiceImpl implements UserTypeService{
 
     private final UserTypeRepository userTypeRepository;
 
+    @Transactional
     @Override
     public UserTypeResponseDto postUserType(UserTypeRequestDto userTypeRequestDto) {
         UserType savedUserType = userTypeRepository.save(UserType.from(userTypeRequestDto));
@@ -41,6 +44,7 @@ public class UserTypeServiceImpl implements UserTypeService{
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public UserTypeResponseDto patchUserType(Long userTypeId, UserTypeUpdateDto userTypeUpdateDto) {
         UserType findedUserType = userTypeRepository.findById(userTypeId)
@@ -52,8 +56,18 @@ public class UserTypeServiceImpl implements UserTypeService{
         return UserTypeResponseDto.from(updatedUserType);
     }
 
+    @Transactional
     @Override
     public void deleteUserType(Long userTypeId) {
         userTypeRepository.deleteById(userTypeId);
+    }
+
+    @PostConstruct
+    public void init() {
+        UserType userType = UserType.builder()
+                .name("없음")
+                .build();
+
+        userTypeRepository.save(userType);
     }
 }

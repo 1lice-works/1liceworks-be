@@ -7,6 +7,7 @@ import com.elice.iliceworksbe.team.dto.position.PositionRequestDto;
 import com.elice.iliceworksbe.team.dto.position.PositionResponseDto;
 import com.elice.iliceworksbe.team.dto.position.PositionUpdateDto;
 import com.elice.iliceworksbe.team.service.PositionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class PositionController {
     @PostMapping
     public BaseResponse<PositionResponseDto> postPosition(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestBody PositionRequestDto positionRequestDto) {
+            @Valid @RequestBody PositionRequestDto positionRequestDto) {
         PositionResponseDto postResponseDto = positionService.postPosition(positionRequestDto);
         return new BaseResponse<>(postResponseDto);
     }
@@ -47,7 +48,7 @@ public class PositionController {
     public BaseResponse<PositionResponseDto> patchPosition(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long positionId,
-            @RequestBody PositionUpdateDto positionUpdateDto) {
+            @Valid @RequestBody PositionUpdateDto positionUpdateDto) {
         PositionResponseDto patchResponseDto = positionService.patchPosition(positionId, positionUpdateDto);
         return new BaseResponse<>(patchResponseDto);
     }

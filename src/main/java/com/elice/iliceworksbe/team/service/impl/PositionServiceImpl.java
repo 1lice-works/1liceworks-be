@@ -10,7 +10,9 @@ import com.elice.iliceworksbe.team.repository.PositionRepository;
 import com.elice.iliceworksbe.team.service.PositionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +22,7 @@ public class PositionServiceImpl implements PositionService {
 
     private final PositionRepository positionRepository;
 
+    @Transactional
     @Override
     public PositionResponseDto postPosition(PositionRequestDto positionRequestDto) {
         Position savedPosition = positionRepository.save(Position.from(positionRequestDto));
@@ -41,6 +44,7 @@ public class PositionServiceImpl implements PositionService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public PositionResponseDto patchPosition(Long positionId, PositionUpdateDto positionUpdateDto) {
         Position findedPosition = positionRepository.findById(positionId)
@@ -52,8 +56,18 @@ public class PositionServiceImpl implements PositionService {
         return PositionResponseDto.from(updatedPosition);
     }
 
+    @Transactional
     @Override
     public void deletePosition(Long positionId) {
         positionRepository.deleteById(positionId);
+    }
+
+    @PostConstruct
+    public void init() {
+        Position position = Position.builder()
+                .name("없음")
+                .build();
+
+        positionRepository.save(position);
     }
 }

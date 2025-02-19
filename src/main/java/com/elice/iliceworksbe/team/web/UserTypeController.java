@@ -7,6 +7,7 @@ import com.elice.iliceworksbe.team.dto.userType.UserTypeRequestDto;
 import com.elice.iliceworksbe.team.dto.userType.UserTypeResponseDto;
 import com.elice.iliceworksbe.team.dto.userType.UserTypeUpdateDto;
 import com.elice.iliceworksbe.team.service.UserTypeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class UserTypeController {
     @PostMapping
     public BaseResponse<UserTypeResponseDto> postUserType(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestBody UserTypeRequestDto userTypeRequestDto) {
+            @Valid @RequestBody UserTypeRequestDto userTypeRequestDto) {
         UserTypeResponseDto postResponseDto = userTypeService.postUserType(userTypeRequestDto);
         return new BaseResponse<>(postResponseDto);
     }
@@ -47,7 +48,7 @@ public class UserTypeController {
     public BaseResponse<UserTypeResponseDto> patchUserType(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long userTypeId,
-            @RequestBody UserTypeUpdateDto userTypeUpdateDto) {
+            @Valid @RequestBody UserTypeUpdateDto userTypeUpdateDto) {
         UserTypeResponseDto patchResponseDto = userTypeService.patchUserType(userTypeId, userTypeUpdateDto);
         return new BaseResponse<>(patchResponseDto);
     }

@@ -1,8 +1,13 @@
 package com.elice.iliceworksbe.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -19,5 +24,19 @@ public class GlobalExceptionHandler {
     public BaseResponse<ErrorCode> ExceptionHandle(Exception exception) {
         log.error("Exception has occured. ", exception);
         return new BaseResponse<>(ErrorCode.UNEXPECTED_ERROR);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public BaseResponse<ErrorCode> ValidationExceptionHandle(MethodArgumentNotValidException exception) {
+        BindingResult bindingResult = exception.getBindingResult();
+
+        String errorDetails = bindingResult.getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+
+        log.warn("Validation failed: {}", errorDetails);
+
+        return new BaseResponse<>(ErrorCode.VALIDATION_ERROR, errorDetails);
     }
 }

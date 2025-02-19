@@ -1,5 +1,6 @@
 package com.elice.iliceworksbe.team.entity;
 
+import com.elice.iliceworksbe.auth.entity.User;
 import com.elice.iliceworksbe.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,16 +26,20 @@ public class Employee extends BaseEntity{
     @Column(name = "employee_id", nullable = false)
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_type_id")
+    @JoinColumn(name = "user_type_id", nullable = false)
     private UserType userType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "position_id")
+    @JoinColumn(name = "position_id", nullable = false)
     private Position position;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "job_title_id")
+    @JoinColumn(name = "job_title_id", nullable = false)
     private JobTitle jobTitle;
 
     @Column(name = "responsibility")
