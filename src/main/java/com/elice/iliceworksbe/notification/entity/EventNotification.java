@@ -3,6 +3,7 @@ package com.elice.iliceworksbe.notification.entity;
 import com.elice.iliceworksbe.auth.entity.User;
 import com.elice.iliceworksbe.calendar.entity.Event;
 import com.elice.iliceworksbe.common.entity.BaseEntity;
+import com.elice.iliceworksbe.notification.dto.request.EventNotificationRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,7 +45,19 @@ public class EventNotification extends BaseEntity {
     @JoinColumn(name = "event_id")
     private Event event;
 
+    public static EventNotification from(EventNotificationRequestDto requestDto){
+        return EventNotification.builder()
+                .notifyTime(requestDto.notifyTime())
+                .message(requestDto.message())
+                .isRead(false)
+                .build();
+    }
 
+    public void assignUser(User user) {
+        this.user = user;
+    }
 
-
+    public void assignEvent(Event event) {
+        this.event = event;
+    }
 }
