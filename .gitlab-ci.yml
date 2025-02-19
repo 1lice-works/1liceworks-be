@@ -1,0 +1,52 @@
+stages:
+  # - test
+  - build
+  - deploy
+
+variables:
+  APP_CONFIG_PATH: src/main/resources/application-dev.yml
+
+cache:
+  paths:
+    - gradle/wrapper/
+    - gradle/caches/
+
+before_script:
+  - echo "Setting up environment"
+  - chmod +x ./gradlew
+
+# test:
+#   stage: test
+#   tags:
+#     - all
+#   script:
+#     - echo "Running tests"
+#     - ./gradlew test
+#   only:
+#     - merge_requests
+
+build:
+  stage: build
+  tags:
+    - all
+  script:
+    - rm -rf /home/gitlab-runner/app
+    - mkdir -p /home/gitlab-runner/app
+    - cp /home/kdt/application-dev.yml src/main/resources/application-dev.yml
+    - ls -l $(dirname $APP_CONFIG_PATH)
+    - echo "Building the application"
+    - ./gradlew clean build --quiet
+    - echo "Starting deployment"
+    - cp build/libs/iliceworks-be-0.0.1-SNAPSHOT.jar /home/gitlab-runner/app/demo.jar
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  tags:
+    - all
+  script:
+    - echo "cicd script running..."
+    - sh deploy.sh
+  only:
+    - main
