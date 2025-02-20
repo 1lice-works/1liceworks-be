@@ -6,15 +6,10 @@ import com.elice.iliceworksbe.common.constant.Role;
 import com.elice.iliceworksbe.common.constant.Status;
 import com.elice.iliceworksbe.common.exception.BaseException;
 import com.elice.iliceworksbe.common.exception.ErrorCode;
-import com.elice.iliceworksbe.team.dto.team.TeamMemberDetailResponseDto;
-import com.elice.iliceworksbe.team.dto.team.TeamMemberInfoUpdateDto;
-import com.elice.iliceworksbe.team.dto.team.TeamMemberRequestDto;
-import com.elice.iliceworksbe.team.dto.team.TeamMemberResponseDto;
-import com.elice.iliceworksbe.team.entity.Employee;
-import com.elice.iliceworksbe.team.entity.JobTitle;
-import com.elice.iliceworksbe.team.entity.Position;
-import com.elice.iliceworksbe.team.entity.UserType;
+import com.elice.iliceworksbe.team.dto.team.*;
+import com.elice.iliceworksbe.team.entity.*;
 import com.elice.iliceworksbe.team.repository.EmployeeRepository;
+import com.elice.iliceworksbe.team.repository.TeamRepository;
 import com.elice.iliceworksbe.team.service.JobTitleService;
 import com.elice.iliceworksbe.team.service.PositionService;
 import com.elice.iliceworksbe.team.service.TeamService;
@@ -30,6 +25,7 @@ public class TeamServiceImpl implements TeamService {
 
     private final UserRepository userRepository;
     private final EmployeeRepository employeeRepository;
+    private final TeamRepository teamRepository;
 
     private final UserTypeService userTypeService;
     private final JobTitleService jobTitleService;
@@ -83,7 +79,10 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     @Override
-    public TeamMemberDetailResponseDto updateMemberInfo(Long memberId, TeamMemberInfoUpdateDto teamMemberInfoUpdateDto) {
+    public TeamMemberDetailResponseDto updateMemberInfo(Long userId, Long memberId, TeamMemberInfoUpdateDto teamMemberInfoUpdateDto) {
+
+        checkUserRole(userId);
+
         User teamMember = userRepository.findById(memberId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
 
@@ -107,4 +106,27 @@ public class TeamServiceImpl implements TeamService {
 
         return TeamMemberDetailResponseDto.of(teamMember, employee);
     }
+
+    @Override
+    public TeamResponseDto updateTeamInfo(Long userId, Long teamId, TeamInfoUpdateDto teamInfoUpdateDto) {
+
+        checkUserRole(userId);
+
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new BaseException(ErrorCode.TEAM_NOT_FOUND));
+
+        team.updateTeamInfo(teamInfoUpdateDto);
+        return TeamResponseDto.from(team);
+    }
+
+    private void checkUserRole(Long userId) {
+        User teamLeader = userRepository.findById(userId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+
+        if (teamLeader.getRole() != Role.LEADER) {
+            throw new BaseException(ErrorCode.ROLE_PERMISSION_DENIED);
+        }
+    }
+
+
 }

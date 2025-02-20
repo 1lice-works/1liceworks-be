@@ -2,10 +2,7 @@ package com.elice.iliceworksbe.team.web;
 
 import com.elice.iliceworksbe.auth.model.UserDetailsImpl;
 import com.elice.iliceworksbe.common.exception.BaseResponse;
-import com.elice.iliceworksbe.team.dto.team.TeamMemberDetailResponseDto;
-import com.elice.iliceworksbe.team.dto.team.TeamMemberInfoUpdateDto;
-import com.elice.iliceworksbe.team.dto.team.TeamMemberRequestDto;
-import com.elice.iliceworksbe.team.dto.team.TeamMemberResponseDto;
+import com.elice.iliceworksbe.team.dto.team.*;
 import com.elice.iliceworksbe.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,7 +28,16 @@ public class TeamController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long memberId,
             @RequestBody TeamMemberInfoUpdateDto teamMemberInfoUpdateDto) {
-        TeamMemberDetailResponseDto teamMemberDetailResponseDto = teamService.updateMemberInfo(memberId, teamMemberInfoUpdateDto);
+        TeamMemberDetailResponseDto teamMemberDetailResponseDto = teamService.updateMemberInfo(userDetails.getUserId(), memberId, teamMemberInfoUpdateDto);
         return new BaseResponse<>(teamMemberDetailResponseDto);
+    }
+
+    @PatchMapping("/{teamId}")
+    public BaseResponse<TeamResponseDto> patchTeam(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long teamId,
+            @RequestBody TeamInfoUpdateDto teamInfoUpdateDto) {
+        TeamResponseDto teamResponseDto = teamService.updateTeamInfo(userDetails.getUserId(), teamId, teamInfoUpdateDto);
+        return new BaseResponse<>(teamResponseDto);
     }
 }

@@ -1,11 +1,9 @@
 package com.elice.iliceworksbe.team.service;
 
-import com.elice.iliceworksbe.team.dto.team.TeamMemberDetailResponseDto;
-import com.elice.iliceworksbe.team.dto.team.TeamMemberInfoUpdateDto;
-import com.elice.iliceworksbe.team.dto.team.TeamMemberRequestDto;
-import com.elice.iliceworksbe.team.dto.team.TeamMemberResponseDto;
+import com.elice.iliceworksbe.team.dto.team.*;
 
 public interface TeamService {
-    TeamMemberResponseDto addMember(Long teamLeaderId, TeamMemberRequestDto teamMemberRequestDto);
-    TeamMemberDetailResponseDto updateMemberInfo(Long memberId, TeamMemberInfoUpdateDto teamMemberInfoUpdateDto);
+    TeamMemberResponseDto addMember(Long userId, TeamMemberRequestDto teamMemberRequestDto);
+    TeamMemberDetailResponseDto updateMemberInfo(Long userId, Long memberId, TeamMemberInfoUpdateDto teamMemberInfoUpdateDto);
+    TeamResponseDto updateTeamInfo(Long userId, Long teamId, TeamInfoUpdateDto teamInfoUpdateDto);
 }

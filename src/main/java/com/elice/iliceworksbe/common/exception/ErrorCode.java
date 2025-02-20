@@ -49,6 +49,7 @@ public enum ErrorCode {
 
     ROLE_PERMISSION_DENIED(false, HttpStatus.FORBIDDEN.value(), "해당 작업에 대한 권한이 없습니다."),
     EMPLOYEE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 직원이 없습니다."),
+    TEAM_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 팀이 없습니다."),
     /**
      * 500 :  Database, Server 오류
      */
