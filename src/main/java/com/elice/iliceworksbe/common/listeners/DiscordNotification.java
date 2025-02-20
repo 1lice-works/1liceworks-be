@@ -6,9 +6,11 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.ContextClosedEvent;
 
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class DiscordNotification {
@@ -35,26 +37,37 @@ public class DiscordNotification {
         sendDiscordNotification("PID= " + applicationPid + " " + message);
     }
 
-    private static void sendDiscordNotification(String message) {
+
+    public static void sendDiscordNotification(String message) {
         try {
-            URL url = new URL(WEBHOOK_URL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            connection.setRequestProperty("Content-Type", "application/json");
-
-            String payload = "{\"content\": \"" + message + "\"}";
-
-            try (OutputStream os = connection.getOutputStream()) {
-                os.write(payload.getBytes());
-                os.flush();
+            if (WEBHOOK_URL == null || WEBHOOK_URL.isEmpty()) {
+                log.warn("❌ 웹훅 URL이 설정되지 않았습니다.");
+                return;
             }
 
-            int responseCode = connection.getResponseCode();
-            System.out.println("Response Code: " + responseCode);
-            log.info("Discord Notification sent successfully.");
+            // JSON 페이로드 생성
+            String payload = "{\"content\": \"" + message + "\"}";
+
+            // HttpClient 객체 생성 (싱글톤으로 관리 가능)
+            HttpClient client = HttpClient.newHttpClient();
+
+            // HttpRequest 생성
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(WEBHOOK_URL))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(payload, StandardCharsets.UTF_8))
+                    .build();
+
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 204) {
+                log.info("✅ Discord Notification sent successfully.");
+            } else {
+                log.warn("⚠️ Failed to send Discord Notification. Response: " + response.body());
+            }
         } catch (Exception e) {
-            log.warn("Error sending notification: " + e.getMessage());
+            log.warn("❌ Error sending notification: " + e.getMessage(), e);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.elice.iliceworksbe.auth.utils;
 import com.elice.iliceworksbe.auth.config.property.TokenProperty;
 import com.elice.iliceworksbe.auth.entity.User;
 import com.elice.iliceworksbe.auth.model.UserDetailsImpl;
+import com.elice.iliceworksbe.common.constant.Role;
 import com.elice.iliceworksbe.common.model.RedisDAO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -14,10 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @Slf4j(topic = "토큰 생성 및 검증")
 @Component
@@ -36,15 +41,16 @@ public class JwtTokenProvider {
 
     // Token 생성
 
-    public String generateAccessToken(String accountId, Long userId) {
-        return generateToken(accountId, userId, tokenProperty.getAccessTokenExpiration());
+    public String generateAccessToken(String accountId, Long userId, Collection<? extends GrantedAuthority> authorities) {
+        return generateToken(accountId, userId, tokenProperty.getAccessTokenExpiration(), authorities);
     }
 
-    private String generateToken(String accountId, Long userId, long expirationTime) {
+    private String generateToken(String accountId, Long userId, long expirationTime, Collection<? extends GrantedAuthority> authorities) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
                 .setSubject(accountId)
                 .claim("userId", userId)
+                .claim("roles", authorities)
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + expirationTime))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -64,9 +70,17 @@ public class JwtTokenProvider {
 
         String accountId = claims.getSubject();
         Long userId = claims.get("userId", Long.class);
+
+        // roles 정보를 추출하여 Collection<GrantedAuthority>로 변환
+        List<?> rolesRaw = claims.get("roles", List.class);
+        List<String> roles = rolesRaw.stream()
+                .map(role -> (String) ((LinkedHashMap<?, ?>) role).get("authority")) // LinkedHashMap에서 "authority" 값 추출
+                .toList();
+
         User user = User.builder()
                 .id(userId)
                 .accountId(accountId)
+                .role(Role.valueOf(roles.get(0)))
                 .build();
 
         UserDetailsImpl userDetails = new UserDetailsImpl(user);

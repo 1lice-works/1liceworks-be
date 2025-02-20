@@ -62,7 +62,8 @@ public enum ErrorCode {
     /**
      * 400 : Validation Error
      */
-    VALIDATION_ERROR(false, HttpStatus.BAD_REQUEST.value(), "요청 데이터 검증 오류");
+    VALIDATION_ERROR(false, HttpStatus.BAD_REQUEST.value(), "요청 데이터 검증 오류"),
+    WRONG_AUTHORIZATION(false, HttpStatus.CONFLICT.value(), "잘못된 권한입니다.");
 
     private final boolean isSuccess;
     private final int code;
