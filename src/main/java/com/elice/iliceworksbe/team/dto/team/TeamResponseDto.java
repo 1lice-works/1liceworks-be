@@ -1,7 +1,9 @@
 package com.elice.iliceworksbe.team.dto.team;
 
 import com.elice.iliceworksbe.team.entity.Team;
+import lombok.Builder;
 
+@Builder
 public record TeamResponseDto(
         String companyName,
         String teamName,
@@ -10,12 +12,12 @@ public record TeamResponseDto(
         String scale
 ) {
     public static TeamResponseDto from(Team team) {
-        return new TeamResponseDto(
-                team.getCompanyName(),
-                team.getTeamName(),
-                team.getDomainName(),
-                team.getIndustry().getKoreanName(),
-                team.getScale().getKoreanName()
-        );
+        return TeamResponseDto.builder()
+                .companyName(team.getCompanyName())
+                .teamName(team.getTeamName())
+                .domainName(team.getDomainName())
+                .industry(team.getIndustry().getKoreanName())
+                .scale(team.getScale().getKoreanName())
+                .build();
     }
 }
