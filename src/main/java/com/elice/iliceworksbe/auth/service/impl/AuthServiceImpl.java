@@ -14,8 +14,9 @@ import com.elice.iliceworksbe.common.exception.BaseException;
 import com.elice.iliceworksbe.common.exception.ErrorCode;
 import com.elice.iliceworksbe.common.model.RedisDAO;
 import com.elice.iliceworksbe.common.service.EmailService;
+import com.elice.iliceworksbe.team.entity.Employee;
 import com.elice.iliceworksbe.team.entity.Team;
-import com.elice.iliceworksbe.team.repository.TeamRepository;
+import com.elice.iliceworksbe.team.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,10 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
+    private final EmployeeRepository employeeRepository;
+    private final PositionRepository positionRepository;
+    private final UserTypeRepository userTypeRepository;
+    private final JobTitleRepository jobTitleRepository;
 
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
@@ -119,6 +124,15 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(signUpUser);
+
+        Employee teamLeader = Employee.builder()
+                .user(signUpUser)
+                .userType(userTypeRepository.findById(1L).get())
+                .position(positionRepository.findById(1L).get())
+                .jobTitle(jobTitleRepository.findById(1L).get())
+                .build();
+
+        employeeRepository.save(teamLeader);
     }
 
     @PostConstruct
