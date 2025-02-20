@@ -34,7 +34,7 @@ public class User extends BaseEntity {
     @Column(name = "account_id", nullable = false)
     private String accountId;
 
-    @Column(name = "private_email", nullable = false)
+    @Column(name = "private_email")
     private String privateEmail;
 
     @Column(name = "role", nullable = false)
