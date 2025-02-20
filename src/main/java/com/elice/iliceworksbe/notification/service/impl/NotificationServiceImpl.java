@@ -31,10 +31,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
-    private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+    private static final Long TIMEOUT = 30 * 60 * 1000L; // 30분
 
     /**
      * SSE 연결
@@ -44,7 +45,7 @@ public class NotificationServiceImpl implements NotificationService {
      */
     @Override
     public SseEmitter createEmitter(String username) {
-        SseEmitter emitter = new SseEmitter(60 * 1000L); // 1분 유지
+        SseEmitter emitter = new SseEmitter(TIMEOUT); // 30분 유지
         configureEmitter(username, emitter);
         emitters.put(username, emitter);
         return emitter;
