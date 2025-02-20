@@ -11,9 +11,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -60,10 +62,26 @@ public class AuthController {
         return new BaseResponse<>(ErrorCode.SUCCESS);
     }
 
-    @Operation(summary = "모든 구성원 프로필 조회", description = "이메일, 사용자명, 프로필이미지 등을 조회합니다.")
+    @Operation(summary = "내 프로필 조회", description = "이메일, 사용자명, 프로필이미지 등을 조회합니다.")
+    @GetMapping("/my-profile")
+    public BaseResponse<GetProfileResponseDto> getMyProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return new BaseResponse<>(authService.getMyProfile(userDetails.getUserId()));
+    }
+
+    @Operation(summary = "팀장의 모든 구성원 프로필 조회", description = "팀원들의 모든 이메일, 사용자명, 프로필이미지 등을 조회합니다.")
     @PreAuthorize("hasAuthority('LEADER')")
     @GetMapping("/profile")
     public BaseResponse<List<GetProfileResponseDto>> getAllMemberProfiles(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return new BaseResponse<>(authService.getAllMemberProfiles(userDetails.getUserId()));
+    }
+
+    @Operation(summary = "내 프로필 변경", description = "프로필 변경입니다.")
+    @PatchMapping(value = "/my-profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public BaseResponse<Void> patchMyProfile(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                  @RequestPart(value = "image", required = false) MultipartFile profileImage,
+                                                                  @RequestPart(value = "text") @Valid PatchProfileRequestDto patchProfileRequestDto
+    ) {
+        authService.patchMyProfile(userDetails.getUserId(), patchProfileRequestDto, profileImage);
+        return new BaseResponse<>(ErrorCode.NO_CONTENT);
     }
 }

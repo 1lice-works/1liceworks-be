@@ -48,6 +48,9 @@ public enum ErrorCode {
     EVENT_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일정을 찾을 수 없습니다."),
     JOB_TITLE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 직책이 없습니다."),
 
+    IMAGE_DELETE_FAILED(false, HttpStatus.BAD_REQUEST.value(), "이미지 삭제에 실패했습니다."),
+    IMAGE_UPLOAD_FAILED(false, HttpStatus.BAD_REQUEST.value(), "이미지 업로드에 실패했습니다."),
+
     /**
      * 500 :  Database, Server 오류
      */

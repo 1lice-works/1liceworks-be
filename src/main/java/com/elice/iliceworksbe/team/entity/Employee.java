@@ -52,4 +52,7 @@ public class Employee extends BaseEntity{
     @Column(name = "hire_date")
     private LocalDateTime hireDate;
 
+    public void designateResponsibility(String responsibility) {
+        this.responsibility = responsibility;
+    }
 }
