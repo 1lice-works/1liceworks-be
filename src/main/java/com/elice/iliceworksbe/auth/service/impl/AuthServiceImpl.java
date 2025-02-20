@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +88,8 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void signUp(SignUpRequestDto signUpRequestDto) {
         // 1. 이메일 인증 확인
-        if(!redisDAO.getValues(signUpRequestDto.userInfo().privateEmail()).equals("VERIFIED")) {
+        String checkEmail = redisDAO.getValues(signUpRequestDto.userInfo().privateEmail());
+        if(checkEmail == null || !checkEmail.equals("VERIFIED")) {
             throw new BaseException(ErrorCode.UNVERIFIED_EMAIL);
         }
 
@@ -125,7 +127,21 @@ public class AuthServiceImpl implements AuthService {
                 .team(newTeam)
                 .build();
 
+        // 5. 해당 유저 Employee 정보 저장
+        Position defaultPosition = positionRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.POSITION_NOT_FOUND));
+        JobTitle defaultJobTitle = jobTitleRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.JOB_TITLE_NOT_FOUND));
+        UserType defaultUserType = userTypeRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.USER_TYPE_NOT_FOUND));
+
+        Employee signUpEmployee = Employee.builder()
+                .user(signUpUser)
+                .userType(defaultUserType)
+                .position(defaultPosition)
+                .jobTitle(defaultJobTitle)
+                .hireDate(LocalDateTime.now())
+                .build();
+
         userRepository.save(signUpUser);
+        employeeRepository.save(signUpEmployee);
     }
 
     @Override
