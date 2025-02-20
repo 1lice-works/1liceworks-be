@@ -3,5 +3,5 @@ package com.elice.iliceworksbe.notification.dto.request;
 
 import java.time.LocalDateTime;
 
-public record EventReminderRequestDto(LocalDateTime notifyTime, Long eventId) {
+public record EventReminderRequestDto(LocalDateTime notifyTime) {
 }

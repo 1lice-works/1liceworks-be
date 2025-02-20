@@ -3,6 +3,10 @@ package com.elice.iliceworksbe.notification.service;
 import com.elice.iliceworksbe.notification.dto.request.EventReminderRequestDto;
 import com.elice.iliceworksbe.notification.dto.response.EventReminderResponseDto;
 
+import java.util.List;
+
 public interface EventReminderService {
-    EventReminderResponseDto postEventNotification(EventReminderRequestDto eventNotificationRequestDto);
+    List<EventReminderResponseDto> postEventReminder(Long eventId, List<EventReminderRequestDto> requestDtos);
+//    void checkAndSendScheduledNotification();
+
 }
