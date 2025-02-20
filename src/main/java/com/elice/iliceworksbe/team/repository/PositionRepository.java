@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface PositionRepository extends JpaRepository<Position, Long> {
     Optional<Position> findByName(String name);
+    boolean existsByName(String name);
 }
