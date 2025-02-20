@@ -14,10 +14,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 @Slf4j(topic = "토큰 생성 및 검증")
 @Component
@@ -36,15 +41,16 @@ public class JwtTokenProvider {
 
     // Token 생성
 
-    public String generateAccessToken(String accountId, Long userId) {
-        return generateToken(accountId, userId, tokenProperty.getAccessTokenExpiration());
+    public String generateAccessToken(String accountId, Long userId, Collection<? extends GrantedAuthority> authorities) {
+        return generateToken(accountId, userId, tokenProperty.getAccessTokenExpiration(), authorities);
     }
 
-    private String generateToken(String accountId, Long userId, long expirationTime) {
+    private String generateToken(String accountId, Long userId, long expirationTime, Collection<? extends GrantedAuthority> authorities) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
                 .setSubject(accountId)
                 .claim("userId", userId)
+                .claim("roles", authorities)
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + expirationTime))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -64,6 +70,17 @@ public class JwtTokenProvider {
 
         String accountId = claims.getSubject();
         Long userId = claims.get("userId", Long.class);
+
+        // roles 정보를 추출하여 Collection<GrantedAuthority>로 변환
+        List<?> rolesRaw = claims.get("roles", List.class);
+        List<String> roles = rolesRaw.stream()
+                .map(role -> (String) ((LinkedHashMap<?, ?>) role).get("authority")) // LinkedHashMap에서 "authority" 값 추출
+                .toList();
+
+        Collection<? extends GrantedAuthority> authorities = roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList();
+
         User user = User.builder()
                 .id(userId)
                 .accountId(accountId)
@@ -71,7 +88,7 @@ public class JwtTokenProvider {
 
         UserDetailsImpl userDetails = new UserDetailsImpl(user);
 
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
     }
 
     // Token 검증

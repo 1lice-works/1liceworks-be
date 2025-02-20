@@ -61,7 +61,7 @@ public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthentication
         UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
 
         // 토큰 발급
-        String accessToken = jwtTokenProvider.generateAccessToken(userDetails.getUsername(), userDetails.getUserId());
+        String accessToken = jwtTokenProvider.generateAccessToken(userDetails.getUsername(), userDetails.getUserId(), userDetails.getAuthorities());
         String refreshToken = refreshTokenProvider.createAndStoreRefreshToken(userDetails.getUserId());
 
         // 리프레시 토큰을 쿠키로 설정
