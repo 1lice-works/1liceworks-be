@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface EventReminderService {
     List<EventReminderResponseDto> postEventReminder(Long eventId, List<EventReminderRequestDto> requestDtos);
+    List<EventReminderResponseDto> getEventReminder(Long eventId);
     void checkEventReminder();
 
 }
