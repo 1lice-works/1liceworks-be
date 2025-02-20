@@ -83,18 +83,19 @@ public class EventReminderServiceImpl implements EventReminderService {
      */
     @Transactional
     public void processEventReminder(EventReminder eventReminder) {
-//                try {
-//                    sendNotification(notification.getUser().getAccountId(), notification.getMessage());
-//                } catch (Exception e) {
-//                    log.error("알림 전송 실패 - 사용자: {}, 오류: {}", notification.getUser().getUsername(), e.getMessage(), e);
-//                }
         Event event = eventReminder.getEvent();
         String message = event.getSummary();
+
         List<EventParticipant> participants = eventParticipantRepository.findByEvent(event);
         log.info("이벤트 '{}' 에 대한 참가자 수: {}", event.getSummary(), participants.size());
+
         participants.forEach(participant -> {
-            NotificationRequestDto requestDto = new NotificationRequestDto(participant.getId(), message);
-            notificationService.sendNotification(requestDto);
+            try {
+                NotificationRequestDto requestDto = new NotificationRequestDto(participant.getId(), message);
+                notificationService.sendNotification(requestDto);
+            } catch (Exception e){
+                log.error("알림 전송 실패 - 사용자: {}, 오류: {}", participant.getId(), e.getMessage(), e);
+            }
         });
 
     }
