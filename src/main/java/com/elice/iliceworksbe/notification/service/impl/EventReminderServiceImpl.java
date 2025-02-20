@@ -1,7 +1,5 @@
 package com.elice.iliceworksbe.notification.service.impl;
 
-import com.elice.iliceworksbe.auth.entity.User;
-import com.elice.iliceworksbe.auth.repository.UserRepository;
 import com.elice.iliceworksbe.calendar.entity.Event;
 import com.elice.iliceworksbe.calendar.repository.EventRepository;
 import com.elice.iliceworksbe.common.exception.BaseException;
@@ -9,7 +7,6 @@ import com.elice.iliceworksbe.common.exception.ErrorCode;
 import com.elice.iliceworksbe.notification.dto.request.EventReminderRequestDto;
 import com.elice.iliceworksbe.notification.dto.response.EventReminderResponseDto;
 import com.elice.iliceworksbe.notification.entity.EventReminder;
-import com.elice.iliceworksbe.notification.entity.Notification;
 import com.elice.iliceworksbe.notification.repository.EventReminderRepository;
 import com.elice.iliceworksbe.notification.service.EventReminderService;
 import lombok.RequiredArgsConstructor;
