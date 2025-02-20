@@ -54,6 +54,10 @@ public enum ErrorCode {
     ROLE_PERMISSION_DENIED(false, HttpStatus.FORBIDDEN.value(), "해당 작업에 대한 권한이 없습니다."),
     EMPLOYEE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 직원이 없습니다."),
     TEAM_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 팀이 없습니다."),
+
+    DUPLICATED_POSITION_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 직급명 입니다."),
+    DUPLICATED_JOB_TITLE_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 직책명 입니다."),
+    DUPLICATED_USER_TYPE_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 사용자 유형 입니다."),
     /**
      * 500 :  Database, Server 오류
      */
