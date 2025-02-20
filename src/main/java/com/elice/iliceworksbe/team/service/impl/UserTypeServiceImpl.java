@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +31,7 @@ public class UserTypeServiceImpl implements UserTypeService{
     @Override
     public UserTypeResponseDto getUserType(Long userTypeId) {
         UserType findedUserType = userTypeRepository.findById(userTypeId)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_TYPE_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
         return UserTypeResponseDto.from(findedUserType);
     }
 
@@ -48,7 +47,7 @@ public class UserTypeServiceImpl implements UserTypeService{
     @Override
     public UserTypeResponseDto patchUserType(Long userTypeId, UserTypeUpdateDto userTypeUpdateDto) {
         UserType findedUserType = userTypeRepository.findById(userTypeId)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_TYPE_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
 
         findedUserType.update(userTypeUpdateDto);
 
@@ -65,25 +64,6 @@ public class UserTypeServiceImpl implements UserTypeService{
     @Override
     public UserType getUserTypeByName(String name) {
         return userTypeRepository.findByName(name)
-                .orElseThrow(() -> new BaseException(ErrorCode.USER_TYPE_NOT_FOUND));
-    }
-
-    @PostConstruct
-    public void init() {
-        UserType userType1 = UserType.builder()
-                .name("없음")
-                .build();
-
-        UserType userType2 = UserType.builder()
-                .name("정규직")
-                .build();
-
-        UserType userType3 = UserType.builder()
-                .name("계약직")
-                .build();
-
-        userTypeRepository.save(userType1);
-        userTypeRepository.save(userType2);
-        userTypeRepository.save(userType3);
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
     }
 }

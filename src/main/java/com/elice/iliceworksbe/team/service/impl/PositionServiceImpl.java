@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +31,7 @@ public class PositionServiceImpl implements PositionService {
     @Override
     public PositionResponseDto getPosition(Long positionId) {
         Position findedPosition = positionRepository.findById(positionId)
-                .orElseThrow(() -> new BaseException(ErrorCode.POSITION_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
         return PositionResponseDto.from(findedPosition);
     }
 
@@ -48,7 +47,7 @@ public class PositionServiceImpl implements PositionService {
     @Override
     public PositionResponseDto patchPosition(Long positionId, PositionUpdateDto positionUpdateDto) {
         Position findedPosition = positionRepository.findById(positionId)
-                .orElseThrow(() -> new BaseException(ErrorCode.POSITION_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
 
         findedPosition.update(positionUpdateDto);
 
@@ -65,30 +64,6 @@ public class PositionServiceImpl implements PositionService {
     @Override
     public Position getPositionByName(String name) {
         return positionRepository.findByName(name)
-                .orElseThrow(() -> new BaseException(ErrorCode.POSITION_NOT_FOUND));
-    }
-
-    @PostConstruct
-    public void init() {
-        Position position1 = Position.builder()
-                .name("없음")
-                .build();
-
-        Position position2 = Position.builder()
-                .name("관리직")
-                .build();
-
-        Position position3 = Position.builder()
-                .name("일반직")
-                .build();
-
-        Position position4 = Position.builder()
-                .name("아르바이트")
-                .build();
-
-        positionRepository.save(position1);
-        positionRepository.save(position2);
-        positionRepository.save(position3);
-        positionRepository.save(position4);
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
     }
 }
