@@ -54,7 +54,7 @@ public class Employee extends BaseEntity{
     @Column(name = "hire_date")
     private LocalDateTime hireDate;
 
-    public void updateEmployeeInfo(
+    public void patchEmployeeInfo(
             TeamMemberInfoUpdateDto teamMemberInfoUpdateDto,
             JobTitle jobTitle, Position position, UserType userType) {
         this.jobTitle = jobTitle;

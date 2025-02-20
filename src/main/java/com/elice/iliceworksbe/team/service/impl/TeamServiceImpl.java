@@ -8,12 +8,8 @@ import com.elice.iliceworksbe.common.exception.BaseException;
 import com.elice.iliceworksbe.common.exception.ErrorCode;
 import com.elice.iliceworksbe.team.dto.team.*;
 import com.elice.iliceworksbe.team.entity.*;
-import com.elice.iliceworksbe.team.repository.EmployeeRepository;
-import com.elice.iliceworksbe.team.repository.TeamRepository;
-import com.elice.iliceworksbe.team.service.JobTitleService;
-import com.elice.iliceworksbe.team.service.PositionService;
+import com.elice.iliceworksbe.team.repository.*;
 import com.elice.iliceworksbe.team.service.TeamService;
-import com.elice.iliceworksbe.team.service.UserTypeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +23,9 @@ public class TeamServiceImpl implements TeamService {
     private final EmployeeRepository employeeRepository;
     private final TeamRepository teamRepository;
 
-    private final UserTypeService userTypeService;
-    private final JobTitleService jobTitleService;
-    private final PositionService positionService;
+    private final PositionRepository positionRepository;
+    private final JobTitleRepository jobTitleRepository;
+    private final UserTypeRepository userTypeRepository;
 
 
     /**
@@ -37,11 +33,11 @@ public class TeamServiceImpl implements TeamService {
      */
     @Transactional
     @Override
-    public TeamMemberResponseDto addMember(Long userId, TeamMemberRequestDto teamMemberRequestDto) {
+    public TeamMemberResponseDto postMember(Long userId, TeamMemberRequestDto teamMemberRequestDto) {
         User teamLeader = userRepository.findById(userId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
 
-        if (userRepository.existsByAccountId(teamMemberRequestDto.accountId())){
+        if (userRepository.existsByAccountId(teamMemberRequestDto.accountId())) {
             throw new BaseException(ErrorCode.DUPLICATED_ACCOUNTID);
         }
 
@@ -57,9 +53,14 @@ public class TeamServiceImpl implements TeamService {
 
         userRepository.save(member);
 
-        UserType userType = userTypeService.getUserTypeByName(teamMemberRequestDto.userTypeName());
-        Position position = positionService.getPositionByName(teamMemberRequestDto.positionName());
-        JobTitle jobTitle = jobTitleService.getJobTileByName(teamMemberRequestDto.positionName());
+        UserType userType = userTypeRepository.findByName(teamMemberRequestDto.userType())
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
+
+        Position position = positionRepository.findByName(teamMemberRequestDto.position())
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
+
+        JobTitle jobTitle = jobTitleRepository.findByName(teamMemberRequestDto.jobTitle())
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_JOB_TITLE));
 
         Employee employee = Employee.builder()
                 .user(member)
@@ -75,40 +76,47 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     @Override
-    public TeamMemberDetailResponseDto updateMemberInfo(Long userId, Long memberId, TeamMemberInfoUpdateDto teamMemberInfoUpdateDto) {
+    public TeamMemberDetailResponseDto patchMemberInfo(Long leaderUserId, Long memberUserId, TeamMemberInfoUpdateDto teamMemberInfoUpdateDto) {
+        Team team = userRepository.findById(leaderUserId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER)).getTeam();
 
-        User teamMember = userRepository.findById(memberId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+        User memberUser = userRepository.findById(memberUserId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
 
-        Employee employee = employeeRepository.findEmployeeByUser(teamMember)
-                .orElseThrow(() -> new BaseException(ErrorCode.EMPLOYEE_NOT_FOUND));
-
-        if (teamMemberInfoUpdateDto.userName() != null && !teamMemberInfoUpdateDto.userName().isBlank()) {
-            teamMember.patchUsername(teamMemberInfoUpdateDto.userName());
+        if (!memberUser.getTeam().equals(team)) {
+            throw new BaseException(ErrorCode.WRONG_AUTHORIZATION);
         }
 
-        UserType userType = userTypeService.getUserTypeByName(teamMemberInfoUpdateDto.userTypeName());
-        Position position = positionService.getPositionByName(teamMemberInfoUpdateDto.positionName());
-        JobTitle jobTitle = jobTitleService.getJobTileByName(teamMemberInfoUpdateDto.jobTitleName());
+        Employee employee = employeeRepository.findEmployeeByUser(memberUser).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
 
-        employee.updateEmployeeInfo(
+        UserType userType = userTypeRepository.findByName(teamMemberInfoUpdateDto.userType())
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
+
+        Position position = positionRepository.findByName(teamMemberInfoUpdateDto.position())
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
+
+        JobTitle jobTitle = jobTitleRepository.findByName(teamMemberInfoUpdateDto.jobTitle())
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_JOB_TITLE));
+
+        memberUser.patchUsername(teamMemberInfoUpdateDto.userName());
+        employee.patchEmployeeInfo(
                 teamMemberInfoUpdateDto,
                 jobTitle,
                 position,
                 userType
         );
-
-        return TeamMemberDetailResponseDto.of(teamMember, employee);
+        return TeamMemberDetailResponseDto.of(memberUser, employee);
     }
 
+    @Transactional
     @Override
-    public TeamResponseDto updateTeamInfo(Long userId, Long teamId, TeamInfoUpdateDto teamInfoUpdateDto) {
+    public TeamResponseDto patchTeamInfo(Long teamId, TeamInfoUpdateDto teamInfoUpdateDto) {
 
 
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new BaseException(ErrorCode.TEAM_NOT_FOUND));
 
         team.updateTeamInfo(teamInfoUpdateDto);
+
         return TeamResponseDto.from(team);
     }
 

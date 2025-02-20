@@ -4,8 +4,8 @@ public record TeamMemberRequestDto(
         String userName,
         String accountId,
         String password,
-        String jobTitleName,
-        String positionName,
-        String userTypeName
+        String jobTitle,
+        String position,
+        String userType
 ) {
 }
