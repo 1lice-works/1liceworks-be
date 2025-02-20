@@ -1,6 +1,7 @@
 package com.elice.iliceworksbe.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,10 +21,10 @@ public class GlobalExceptionHandler {
         return new BaseResponse<>(exception.getStatus());
     }
 
-    @ExceptionHandler(Exception.class)
-    public BaseResponse<ErrorCode> ExceptionHandle(Exception exception) {
-        log.error("Exception has occured. ", exception);
-        return new BaseResponse<>(ErrorCode.UNEXPECTED_ERROR);
+    @ExceptionHandler(AuthorizationDeniedException.class) // 권한 처리
+    public BaseResponse<ErrorCode> AuthorizationDeniedExceptionHandle(AuthorizationDeniedException exception) {
+        log.warn("AuthorizationDeniedException. error message: {}", exception.getMessage());
+        return new BaseResponse<>(ErrorCode.WRONG_AUTHORIZATION);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -38,5 +39,11 @@ public class GlobalExceptionHandler {
         log.warn("Validation failed: {}", errorDetails);
 
         return new BaseResponse<>(ErrorCode.VALIDATION_ERROR, errorDetails);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public BaseResponse<ErrorCode> ExceptionHandle(Exception exception) {
+        log.error("Exception has occured. ", exception);
+        return new BaseResponse<>(ErrorCode.UNEXPECTED_ERROR);
     }
 }

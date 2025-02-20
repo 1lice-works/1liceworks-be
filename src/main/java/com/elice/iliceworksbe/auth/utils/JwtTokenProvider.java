@@ -3,6 +3,7 @@ package com.elice.iliceworksbe.auth.utils;
 import com.elice.iliceworksbe.auth.config.property.TokenProperty;
 import com.elice.iliceworksbe.auth.entity.User;
 import com.elice.iliceworksbe.auth.model.UserDetailsImpl;
+import com.elice.iliceworksbe.common.constant.Role;
 import com.elice.iliceworksbe.common.model.RedisDAO;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -15,7 +16,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -77,18 +77,15 @@ public class JwtTokenProvider {
                 .map(role -> (String) ((LinkedHashMap<?, ?>) role).get("authority")) // LinkedHashMap에서 "authority" 값 추출
                 .toList();
 
-        Collection<? extends GrantedAuthority> authorities = roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .toList();
-
         User user = User.builder()
                 .id(userId)
                 .accountId(accountId)
+                .role(Role.valueOf(roles.get(0)))
                 .build();
 
         UserDetailsImpl userDetails = new UserDetailsImpl(user);
 
-        return new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
     // Token 검증
