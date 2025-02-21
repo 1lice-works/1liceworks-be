@@ -44,7 +44,6 @@ public class Notification extends BaseEntity {
         return Notification.builder()
                 .message(requestDto.message())
                 .notifyTime(LocalDateTime.now())
-                .isRead(false)
                 .build();
     }
 

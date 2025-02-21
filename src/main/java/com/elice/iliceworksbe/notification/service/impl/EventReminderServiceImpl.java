@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -55,6 +56,19 @@ public class EventReminderServiceImpl implements EventReminderService {
             responseDtos.add(EventReminderResponseDto.from(savedEventReminder));
         }
         return responseDtos;
+    }
+
+    /**
+     * EventReminder 조회
+     * @param eventId
+     * @return
+     */
+    @Override
+    public List<EventReminderResponseDto> getEventReminder(Long eventId) {
+        return eventReminderRepository.findAllByEventId(eventId)
+                .stream()
+                .map(EventReminderResponseDto::from)
+                .collect(Collectors.toList());
     }
 
     /**
