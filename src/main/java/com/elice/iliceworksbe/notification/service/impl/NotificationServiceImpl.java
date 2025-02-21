@@ -100,25 +100,38 @@ public class NotificationServiceImpl implements NotificationService {
      */
     @Override
     public void sendNotification(NotificationRequestDto requestDto) {
-        SseEmitter emitter = emitters.get(requestDto.userId());
+        // 1. Notification 테이블에 insert
+        NotificationResponseDto savedNotification = postNotification(requestDto);
+        log.info("저장된 notification = {} {}", savedNotification.notifyTime(), savedNotification.message());
 
+        // 2. SSE 구독 여부 확인
+        SseEmitter emitter = emitters.get(requestDto.userId());
         if (emitter != null) {
             try {
+                // 3. SSE 실시간 알림 전송
                 emitter.send(SseEmitter.event().name("notification").data(requestDto.message()));
 
-                //Notification 테이블에 insert
-                NotificationResponseDto savedNotification = postNotification(requestDto);
-                log.info("저장된 notification = {} {}", savedNotification.notifyTime(), savedNotification.message());
+                // 4. 전송 성공시 isSent -> true
+                updateNotificationStatus(savedNotification.notificationId(), true);
+                log.info("SSE 알림 전송 완료: {}", savedNotification.message());
 
             } catch (IOException | IllegalStateException e) {
                 log.warn("실시간 알림 발송 실패: {}", e.getMessage());
                 emitters.remove(requestDto.userId(), emitter);
             }
+        } else {
+            log.info("사용자가 현재 SSE 구독 중이 아님, 로그인 후 알림 확인 가능");
         }
+    }
+
+    @Override
+    public void updateNotificationStatus(Long notificationId, boolean isSent) {
+        notificationRepository.updateIsSent(notificationId, isSent);
     }
 
     /**
      * sse 연결 종료
+     *
      * @param userId
      */
     @Override
@@ -132,6 +145,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * Notification 테이블에 insert
+     *
      * @param requestDto
      * @return
      */
@@ -148,6 +162,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * Notification 테이블 조회 (최대 50개, 최대 1달)
+     *
      * @param userId
      * @return
      */
