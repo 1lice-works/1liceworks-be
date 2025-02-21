@@ -18,64 +18,52 @@ public enum ErrorCode {
     NO_CONTENT(true, HttpStatus.NO_CONTENT.value(), "요청 성공 (no content)"),
     CREATED(true, HttpStatus.CREATED.value(), "요청 성공 (created)"),
 
-
     /**
      * 400 : Request, Response 오류
      */
-    USERS_INFO_UNKNOWN(false, HttpStatus.BAD_REQUEST.value(), "알 수 없는 유저입니다."),
-
-    UNVERIFIED_EMAIL(false, HttpStatus.BAD_REQUEST.value(), "인증되지 않은 이메일입니다."),
-    POST_USERS_INVALID_EMAIL(false, HttpStatus.BAD_REQUEST.value(), "이메일 형식을 확인해주세요."),
-    POST_USERS_EXISTS_ACCOUNTID(false,HttpStatus.BAD_REQUEST.value(),"중복된 계정ID입니다."),
-    POST_TEST_EXISTS_MEMO(false,HttpStatus.BAD_REQUEST.value(),"중복된 메모입니다."),
-
-    WRONG_AUTH_CODE(false, HttpStatus.CONFLICT.value(), "잘못된 인증코드입니다."),
-
-    RESPONSE_ERROR(false, HttpStatus.NOT_FOUND.value(), "값을 불러오는데 실패하였습니다."),
-
-    DUPLICATED_ACCOUNTID(false, HttpStatus.BAD_REQUEST.value(), "중복된 계정ID입니다."),
-    DUPLICATED_EMAIL(false, HttpStatus.BAD_REQUEST.value(), "중복된 이메일입니다."),
-    FAILED_TO_LOGIN(false,HttpStatus.NOT_FOUND.value(),"없는 아이디거나 비밀번호가 틀렸습니다."),
-    EMPTY_JWT(false, HttpStatus.UNAUTHORIZED.value(), "JWT를 입력해주세요."),
-    INVALID_JWT(false, HttpStatus.UNAUTHORIZED.value(), "유효하지 않은 JWT입니다."),
-    INVALID_USER_JWT(false,HttpStatus.FORBIDDEN.value(),"권한이 없는 유저의 접근입니다."),
-    NOT_FIND_USER(false,HttpStatus.NOT_FOUND.value(),"일치하는 유저가 없습니다."),
-    NOT_FIND_EMPLOYEE(false,HttpStatus.NOT_FOUND.value(),"일치하는 직원이 없습니다."),
-    MATCH_BEFORE_PASSWORD(false, HttpStatus.BAD_REQUEST.value(), "새로운 비밀번호가 현재 비밀번호와 동일합니다."),
-
-    NOT_FIND_POSITION(false,HttpStatus.NOT_FOUND.value(),"일치하는 직급이 없습니다."),
-    NOT_FIND_JOB_TITLE(false,HttpStatus.NOT_FOUND.value(),"일치하는 직책이 없습니다."),
-    NOT_FIND_USER_TYPE(false,HttpStatus.NOT_FOUND.value(),"일치하는 사용자 유형이 없습니다."),
-
+    NOT_FOUND_USER(false, HttpStatus.NOT_FOUND.value(), "일치하는 유저가 없습니다."),
+    NOT_FOUND_EMPLOYEE(false, HttpStatus.NOT_FOUND.value(), "일치하는 직원이 없습니다."),
+    NOT_FOUND_POSITION(false, HttpStatus.NOT_FOUND.value(), "일치하는 직급이 없습니다."),
+    NOT_FOUND_JOB_TITLE(false, HttpStatus.NOT_FOUND.value(), "일치하는 직책이 없습니다."),
+    NOT_FOUND_USER_TYPE(false, HttpStatus.NOT_FOUND.value(), "일치하는 사용자 유형이 없습니다."),
     NOT_FOUND_CALENDAR(false, HttpStatus.NOT_FOUND.value(), "캘린더를 찾을 수 없습니다."),
     NOT_FOUND_TEAM(false, HttpStatus.NOT_FOUND.value(), "팀을 찾을 수 없습니다."),
-    EVENT_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일정을 찾을 수 없습니다."),
+    NOT_FOUND_EVENT(false, HttpStatus.NOT_FOUND.value(), "일정을 찾을 수 없습니다."),
 
-    IMAGE_DELETE_FAILED(false, HttpStatus.BAD_REQUEST.value(), "이미지 삭제에 실패했습니다."),
-    IMAGE_UPLOAD_FAILED(false, HttpStatus.BAD_REQUEST.value(), "이미지 업로드에 실패했습니다."),
+    FAILED_TO_FIND_RESPONSE(false, HttpStatus.NOT_FOUND.value(), "값을 불러오는데 실패하였습니다."),
+    FAILED_TO_LOGIN(false, HttpStatus.NOT_FOUND.value(), "없는 아이디거나 비밀번호가 틀렸습니다."),
+    FAILED_TO_MATCH_BEFORE_PASSWORD(false, HttpStatus.BAD_REQUEST.value(), "새로운 비밀번호가 현재 비밀번호와 동일합니다."),
+    FAILED_TO_DELETE_IMAGE(false, HttpStatus.BAD_REQUEST.value(), "이미지 삭제에 실패했습니다."),
+    FAILED_TO_UPLOAD_IMAGE(false, HttpStatus.BAD_REQUEST.value(), "이미지 업로드에 실패했습니다."),
 
-    ROLE_PERMISSION_DENIED(false, HttpStatus.FORBIDDEN.value(), "해당 작업에 대한 권한이 없습니다."),
-    EMPLOYEE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 직원이 없습니다."),
-    TEAM_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 팀이 없습니다."),
+    INVALID_AUTH_CODE(false, HttpStatus.CONFLICT.value(), "잘못된 인증코드입니다."),
+    INVALID_JWT(false, HttpStatus.UNAUTHORIZED.value(), "유효하지 않은 JWT입니다."),
+    INVALID_USER_JWT(false, HttpStatus.FORBIDDEN.value(), "권한이 없는 유저의 접근입니다."),
+    INVALID_EMAIL_FORMAT(false, HttpStatus.BAD_REQUEST.value(), "이메일 형식을 확인해주세요."),
+    INVALID_AUTHORIZATION(false, HttpStatus.CONFLICT.value(), "잘못된 권한입니다."),
 
-    DUPLICATED_POSITION_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 직급명 입니다."),
-    DUPLICATED_JOB_TITLE_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 직책명 입니다."),
-    DUPLICATED_USER_TYPE_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 사용자 유형 입니다."),
+    DUPLICATED_ACCOUNT_ID(false, HttpStatus.BAD_REQUEST.value(), "중복된 계정 ID입니다."),
+    DUPLICATED_EMAIL(false, HttpStatus.BAD_REQUEST.value(), "중복된 이메일입니다."),
+    DUPLICATED_POSITION_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 직급명입니다."),
+    DUPLICATED_JOB_TITLE_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 직책명입니다."),
+    DUPLICATED_USER_TYPE_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 사용자 유형입니다."),
+
+    MISSING_JWT(false, HttpStatus.UNAUTHORIZED.value(), "JWT를 입력해주세요."),
+    UNVERIFIED_EMAIL(false, HttpStatus.BAD_REQUEST.value(), "인증되지 않은 이메일입니다."),
+
     /**
-     * 500 :  Database, Server 오류
+     * 500 : Database, Server 오류
      */
-    DATABASE_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 연결에 실패하였습니다."),
-    SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버와의 연결에 실패하였습니다."),
-    PASSWORD_ENCRYPTION_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "비밀번호 암호화에 실패하였습니다."),
-    PASSWORD_DECRYPTION_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "비밀번호 복호화에 실패하였습니다."),
-
+    FAILED_TO_CONNECT_DATABASE(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 연결에 실패하였습니다."),
+    FAILED_TO_CONNECT_SERVER(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버와의 연결에 실패하였습니다."),
+    FAILED_TO_ENCRYPT_PASSWORD(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "비밀번호 암호화에 실패하였습니다."),
+    FAILED_TO_DECRYPT_PASSWORD(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "비밀번호 복호화에 실패하였습니다."),
     UNEXPECTED_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "예상치 못한 에러가 발생했습니다."),
 
     /**
      * 400 : Validation Error
      */
-    VALIDATION_ERROR(false, HttpStatus.BAD_REQUEST.value(), "요청 데이터 검증 오류"),
-    WRONG_AUTHORIZATION(false, HttpStatus.CONFLICT.value(), "잘못된 권한입니다.");
+    VALIDATION_ERROR(false, HttpStatus.BAD_REQUEST.value(), "요청 데이터 검증 오류");
 
     private final boolean isSuccess;
     private final int code;

@@ -176,7 +176,7 @@ public class NotificationServiceImpl implements NotificationService {
      */
     private NotificationResponseDto postNotification(NotificationRequestDto requestDto) {
         User user = userRepository.findById(requestDto.userId())
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         Notification notification = Notification.from(requestDto);
         notification.assignUser(user);

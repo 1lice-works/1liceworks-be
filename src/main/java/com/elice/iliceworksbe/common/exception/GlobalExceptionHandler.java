@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthorizationDeniedException.class) // 권한 처리
     public BaseResponse<ErrorCode> AuthorizationDeniedExceptionHandle(AuthorizationDeniedException exception) {
         log.warn("AuthorizationDeniedException. error message: {}", exception.getMessage());
-        return new BaseResponse<>(ErrorCode.WRONG_AUTHORIZATION);
+        return new BaseResponse<>(ErrorCode.INVALID_AUTHORIZATION);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

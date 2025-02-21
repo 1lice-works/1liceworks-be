@@ -36,7 +36,7 @@ public class JobTitleServiceImpl implements JobTitleService {
     @Override
     public JobTitleResponseDto getJobTitle(Long jobTitleId) {
         JobTitle findedJobTitle = jobTitleRepository.findById(jobTitleId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_JOB_TITLE));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_JOB_TITLE));
         return JobTitleResponseDto.from(findedJobTitle);
     }
 
@@ -52,7 +52,7 @@ public class JobTitleServiceImpl implements JobTitleService {
     @Override
     public JobTitleResponseDto patchJobTitle(Long jobTitleId, JobTitleUpdateDto jobTitleUpdateDto) {
         JobTitle findedJobTitle = jobTitleRepository.findById(jobTitleId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_JOB_TITLE));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_JOB_TITLE));
 
         findedJobTitle.update(jobTitleUpdateDto);
 

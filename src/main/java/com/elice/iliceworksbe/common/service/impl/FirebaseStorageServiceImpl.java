@@ -34,7 +34,7 @@ public class FirebaseStorageServiceImpl implements FirebaseStorageService {
             String fileName = imageUrl.substring(imageUrl.indexOf("/o/") + 3, imageUrl.indexOf("?alt=media"));
             StorageClient.getInstance().bucket(firebaseProperty.getBucketName()).get(fileName).delete();
         } catch (Exception e) {
-            throw new BaseException(ErrorCode.IMAGE_DELETE_FAILED);
+            throw new BaseException(ErrorCode.FAILED_TO_DELETE_IMAGE);
         }
     }
 }
