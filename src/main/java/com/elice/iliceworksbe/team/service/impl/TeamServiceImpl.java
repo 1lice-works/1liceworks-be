@@ -74,7 +74,7 @@ public class TeamServiceImpl implements TeamService {
 
         employeeRepository.save(employee);
 
-        return TeamMemberResponseDto.from(member, generatedPassword);
+        return TeamMemberResponseDto.of(member, generatedPassword);
     }
 
     @Transactional

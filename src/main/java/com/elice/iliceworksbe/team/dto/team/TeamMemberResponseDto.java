@@ -10,7 +10,7 @@ public record TeamMemberResponseDto(
         String accountId,
         String password
 ) {
-    public static TeamMemberResponseDto from(User user, String password) {
+    public static TeamMemberResponseDto of(User user, String password) {
         return TeamMemberResponseDto.builder()
                 .userName(user.getUsername())
                 .accountId(user.getAccountId())
