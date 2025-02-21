@@ -3,6 +3,7 @@ package com.elice.iliceworksbe.notification.entity;
 import com.elice.iliceworksbe.calendar.entity.Calendar;
 import com.elice.iliceworksbe.common.constant.ContentType;
 import com.elice.iliceworksbe.common.entity.BaseEntity;
+import com.elice.iliceworksbe.notification.dto.request.WebhookRequestDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,4 +37,13 @@ public class Webhook extends BaseEntity{
     @JoinColumn(name = "calendar_id")
     private Calendar calendar;
 
+    public static Webhook from(WebhookRequestDto requestDto){
+        return Webhook.builder()
+                .payloadUrl(requestDto.payloadUrl())
+                .contentType(requestDto.contentType())
+                .build();
+    }
+
+    public void assignCalendar(Calendar calendar){
+        this.calendar = calendar;}
 }

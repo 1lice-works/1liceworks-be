@@ -1,4 +1,6 @@
 package com.elice.iliceworksbe.notification.dto.request;
 
-public record WebhookRequestDto() {
+import com.elice.iliceworksbe.common.constant.ContentType;
+
+public record WebhookRequestDto(Long calendarId, String payloadUrl, ContentType contentType) {
 }

@@ -49,6 +49,9 @@ public enum ErrorCode {
     USER_TYPE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 유저 타입이 없습니다."),
     POSITION_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 직급이 없습니다."),
 
+    NOT_FOUND_TEAM(false, HttpStatus.NOT_FOUND.value(), "팀을 찾을 수 없습니다."),
+
+    NOT_FOUND_CALENDAR(false, HttpStatus.NOT_FOUND.value(), "캘린더를 찾을 수 없습니다."),
     EVENT_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일정을 찾을 수 없습니다."),
     JOB_TITLE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 직책이 없습니다."),
 
