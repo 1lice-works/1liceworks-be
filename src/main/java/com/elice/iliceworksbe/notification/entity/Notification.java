@@ -36,6 +36,9 @@ public class Notification extends BaseEntity {
     @Column(name = "is_read")
     private Boolean isRead;
 
+    @Column(name = "is_sent")
+    private Boolean isSent;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
