@@ -1,5 +1,6 @@
 package com.elice.iliceworksbe.notification.entity;
 
+import com.elice.iliceworksbe.calendar.dto.request.PostTeamEventRequestDto;
 import com.elice.iliceworksbe.calendar.entity.Event;
 import com.elice.iliceworksbe.common.entity.BaseEntity;
 import com.elice.iliceworksbe.notification.dto.request.EventReminderRequestDto;
@@ -35,6 +36,12 @@ public class EventReminder extends BaseEntity {
     public static EventReminder from(EventReminderRequestDto requestDto) {
         return EventReminder.builder()
                 .notifyTime(requestDto.notifyTime())
+                .build();
+    }
+
+    public static EventReminder from(PostTeamEventRequestDto.EventReminderDto eventReminderDto) {
+        return EventReminder.builder()
+                .notifyTime(eventReminderDto.notifyTime())
                 .build();
     }
 

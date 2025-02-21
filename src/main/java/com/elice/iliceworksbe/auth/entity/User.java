@@ -67,4 +67,8 @@ public class User extends BaseEntity {
     public void patchUsername(String username) {
         this.username = username;
     }
+
+    public boolean checkMyTeam(Team team) {
+        return this.team.equals(team);
+    }
 }
