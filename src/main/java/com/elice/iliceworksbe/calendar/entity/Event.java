@@ -1,5 +1,6 @@
 package com.elice.iliceworksbe.calendar.entity;
 
+import com.elice.iliceworksbe.calendar.dto.request.PostTeamEventRequestDto;
 import com.elice.iliceworksbe.common.constant.Availability;
 import com.elice.iliceworksbe.common.constant.PrivacyType;
 import com.elice.iliceworksbe.common.entity.BaseEntity;
@@ -26,8 +27,8 @@ public class Event extends BaseEntity{
     @Column(name = "event_id", nullable = false)
     private Long id;
 
-    @Column(name = "summary", nullable = false)
-    private String summary;
+    @Column(name = "title", nullable = false)
+    private String title;
 
     @Column(name = "description")
     private String description;
@@ -55,4 +56,20 @@ public class Event extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calendar_id")
     private Calendar calendar;
+
+
+    public static Event of(PostTeamEventRequestDto postTeamEventRequestDto, Calendar calendar){
+        return Event.builder()
+                .title(postTeamEventRequestDto.title())
+                .description(postTeamEventRequestDto.description())
+                .dtStartTime(postTeamEventRequestDto.dtStartTime())
+                .dtEndTime(postTeamEventRequestDto.dtEndTime())
+                .isAllDay(postTeamEventRequestDto.isAllDay())
+                .privacy(postTeamEventRequestDto.privacyType())
+                .availability(postTeamEventRequestDto.availability())
+                .location(postTeamEventRequestDto.location())
+                .calendar(calendar)
+                .build();
+    }
+
 }
