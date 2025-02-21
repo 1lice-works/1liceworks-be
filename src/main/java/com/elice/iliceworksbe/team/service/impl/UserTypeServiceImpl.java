@@ -36,7 +36,7 @@ public class UserTypeServiceImpl implements UserTypeService{
     @Override
     public UserTypeResponseDto getUserType(Long userTypeId) {
         UserType findedUserType = userTypeRepository.findById(userTypeId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER_TYPE));
         return UserTypeResponseDto.from(findedUserType);
     }
 
@@ -52,7 +52,7 @@ public class UserTypeServiceImpl implements UserTypeService{
     @Override
     public UserTypeResponseDto patchUserType(Long userTypeId, UserTypeUpdateDto userTypeUpdateDto) {
         UserType findedUserType = userTypeRepository.findById(userTypeId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER_TYPE));
 
         findedUserType.update(userTypeUpdateDto);
 

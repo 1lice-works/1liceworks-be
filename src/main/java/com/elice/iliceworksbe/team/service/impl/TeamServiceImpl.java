@@ -44,10 +44,10 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public TeamMemberResponseDto postMember(Long userId, TeamMemberRequestDto teamMemberRequestDto) {
         User teamLeader = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         if (userRepository.existsByAccountId(teamMemberRequestDto.accountId())) {
-            throw new BaseException(ErrorCode.DUPLICATED_ACCOUNTID);
+            throw new BaseException(ErrorCode.DUPLICATED_ACCOUNT_ID);
         }
 
         String generatedPassword = PasswordGenerator.generatePassword();
@@ -55,11 +55,11 @@ public class TeamServiceImpl implements TeamService {
         userRepository.save(member);
 
         UserType userType = userTypeRepository.findByName(teamMemberRequestDto.userType())
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER_TYPE));
         Position position = positionRepository.findByName(teamMemberRequestDto.position())
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_POSITION));
         JobTitle jobTitle = jobTitleRepository.findByName(teamMemberRequestDto.jobTitle())
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_JOB_TITLE));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_JOB_TITLE));
 
         Employee employee = addNewEmployee(member, userType, position, jobTitle);
         employeeRepository.save(employee);
@@ -107,13 +107,13 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public void deleteMember(Long leaderUserId, Long memberUserId) {
         Team team = userRepository.findById(leaderUserId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER)).getTeam();
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER)).getTeam();
 
         User memberUser = userRepository.findById(memberUserId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         if (!memberUser.getTeam().equals(team)) {
-            throw new BaseException(ErrorCode.WRONG_AUTHORIZATION);
+            throw new BaseException(ErrorCode.INVALID_AUTHORIZATION);
         }
 
         archivingUserRepository.save(memberUser.toArchivingUser());
@@ -123,12 +123,12 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public void pauseMember(Long leaderUserId, Long memberUserId) {
         Team team = userRepository.findById(leaderUserId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER)).getTeam();
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER)).getTeam();
 
-        User memberUser = userRepository.findById(memberUserId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+        User memberUser = userRepository.findById(memberUserId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         if (!memberUser.getTeam().equals(team)) {
-            throw new BaseException(ErrorCode.WRONG_AUTHORIZATION);
+            throw new BaseException(ErrorCode.INVALID_AUTHORIZATION);
         }
 
         memberUser.setUserStatus(Status.INACTIVE);
@@ -138,24 +138,24 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public TeamMemberDetailResponseDto patchMemberInfo(Long leaderUserId, Long memberUserId, TeamMemberInfoUpdateDto teamMemberInfoUpdateDto) {
         Team team = userRepository.findById(leaderUserId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER)).getTeam();
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER)).getTeam();
 
         User memberUser = userRepository.findById(memberUserId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         if (!memberUser.getTeam().equals(team)) {
-            throw new BaseException(ErrorCode.WRONG_AUTHORIZATION);
+            throw new BaseException(ErrorCode.INVALID_AUTHORIZATION);
         }
 
         Employee employee = employeeRepository.findEmployeeByUser(memberUser)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         UserType userType = userTypeRepository.findByName(teamMemberInfoUpdateDto.userType())
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER_TYPE));
         Position position = positionRepository.findByName(teamMemberInfoUpdateDto.position())
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_POSITION));
         JobTitle jobTitle = jobTitleRepository.findByName(teamMemberInfoUpdateDto.jobTitle())
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_JOB_TITLE));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_JOB_TITLE));
 
         memberUser.patchUsername(teamMemberInfoUpdateDto.userName());
 
@@ -179,13 +179,13 @@ public class TeamServiceImpl implements TeamService {
     public TeamResponseDto patchTeamInfo(Long leaderUserId, Long teamId, TeamInfoUpdateDto teamInfoUpdateDto) {
 
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new BaseException(ErrorCode.TEAM_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_TEAM));
 
         User teamLeader = userRepository.findById(leaderUserId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         if (!teamLeader.getTeam().equals(team)) {
-            throw new BaseException(ErrorCode.WRONG_AUTHORIZATION);
+            throw new BaseException(ErrorCode.INVALID_AUTHORIZATION);
         }
 
         team.updateTeamInfo(teamInfoUpdateDto);

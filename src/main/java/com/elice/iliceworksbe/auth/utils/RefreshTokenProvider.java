@@ -49,7 +49,7 @@ public class RefreshTokenProvider {
     // AccessToken 발급을 위한 User 조회를 동시에 진행.
     public User validateRefreshToken(String refreshToken) {
         AuthToken authToken = authTokenRepository.findByTokenWithUser(refreshToken)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         if(LocalDateTime.now().isBefore(authToken.getExpiresAt())) {
             return authToken.getUser();
