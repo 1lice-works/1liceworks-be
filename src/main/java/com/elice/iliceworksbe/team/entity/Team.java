@@ -3,6 +3,7 @@ package com.elice.iliceworksbe.team.entity;
 import com.elice.iliceworksbe.common.entity.BaseEntity;
 import com.elice.iliceworksbe.team.constant.Industry;
 import com.elice.iliceworksbe.team.constant.Scale;
+import com.elice.iliceworksbe.team.dto.team.TeamInfoUpdateDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,4 +44,10 @@ public class Team extends BaseEntity {
     @Column(name = "scale", nullable = false)
     @Enumerated(EnumType.STRING)
     private Scale scale;
+
+    public void updateTeamInfo(TeamInfoUpdateDto teamInfoUpdateDto) {
+        if (teamInfoUpdateDto.teamName() != null) {
+            this.teamName = teamInfoUpdateDto.teamName();
+        }
+    }
 }

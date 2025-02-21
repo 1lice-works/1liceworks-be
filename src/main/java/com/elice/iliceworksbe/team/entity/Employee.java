@@ -3,6 +3,7 @@ package com.elice.iliceworksbe.team.entity;
 import com.elice.iliceworksbe.auth.dto.request.PatchMemberProfileRequestDto;
 import com.elice.iliceworksbe.auth.entity.User;
 import com.elice.iliceworksbe.common.entity.BaseEntity;
+import com.elice.iliceworksbe.team.dto.team.TeamMemberInfoUpdateDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,6 +53,16 @@ public class Employee extends BaseEntity{
     @CreatedDate
     @Column(name = "hire_date")
     private LocalDateTime hireDate;
+
+    public void patchEmployeeInfo(
+            TeamMemberInfoUpdateDto teamMemberInfoUpdateDto,
+            JobTitle jobTitle, Position position, UserType userType) {
+        this.jobTitle = jobTitle;
+        this.position = position;
+        this.userType = userType;
+        this.responsibility = teamMemberInfoUpdateDto.responsibility();
+        this.employeeNumber = teamMemberInfoUpdateDto.employeeNumber();
+    }
 
     public void designateResponsibility(String responsibility) {
         this.responsibility = responsibility;

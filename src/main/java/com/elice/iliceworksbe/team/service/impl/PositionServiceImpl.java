@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +24,11 @@ public class PositionServiceImpl implements PositionService {
     @Transactional
     @Override
     public PositionResponseDto postPosition(PositionRequestDto positionRequestDto) {
+
+        if (positionRepository.existsByName(positionRequestDto.name())) {
+            throw new BaseException(ErrorCode.DUPLICATED_POSITION_NAME);
+        }
+
         Position savedPosition = positionRepository.save(Position.from(positionRequestDto));
         return PositionResponseDto.from(savedPosition);
     }
@@ -32,7 +36,7 @@ public class PositionServiceImpl implements PositionService {
     @Override
     public PositionResponseDto getPosition(Long positionId) {
         Position findedPosition = positionRepository.findById(positionId)
-                .orElseThrow(() -> new BaseException(ErrorCode.POSITION_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
         return PositionResponseDto.from(findedPosition);
     }
 
@@ -48,7 +52,7 @@ public class PositionServiceImpl implements PositionService {
     @Override
     public PositionResponseDto patchPosition(Long positionId, PositionUpdateDto positionUpdateDto) {
         Position findedPosition = positionRepository.findById(positionId)
-                .orElseThrow(() -> new BaseException(ErrorCode.POSITION_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
 
         findedPosition.update(positionUpdateDto);
 
@@ -62,12 +66,4 @@ public class PositionServiceImpl implements PositionService {
         positionRepository.deleteById(positionId);
     }
 
-    @PostConstruct
-    public void init() {
-        Position position = Position.builder()
-                .name("없음")
-                .build();
-
-        positionRepository.save(position);
-    }
 }

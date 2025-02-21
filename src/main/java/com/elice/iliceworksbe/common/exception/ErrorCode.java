@@ -46,15 +46,18 @@ public enum ErrorCode {
     NOT_FIND_JOB_TITLE(false,HttpStatus.NOT_FOUND.value(),"일치하는 직책이 없습니다."),
     NOT_FIND_USER_TYPE(false,HttpStatus.NOT_FOUND.value(),"일치하는 사용자 유형이 없습니다."),
 
-    USER_TYPE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 유저 타입이 없습니다."),
-    POSITION_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 직급이 없습니다."),
-
     EVENT_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일정을 찾을 수 없습니다."),
-    JOB_TITLE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 직책이 없습니다."),
 
     IMAGE_DELETE_FAILED(false, HttpStatus.BAD_REQUEST.value(), "이미지 삭제에 실패했습니다."),
     IMAGE_UPLOAD_FAILED(false, HttpStatus.BAD_REQUEST.value(), "이미지 업로드에 실패했습니다."),
 
+    ROLE_PERMISSION_DENIED(false, HttpStatus.FORBIDDEN.value(), "해당 작업에 대한 권한이 없습니다."),
+    EMPLOYEE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 직원이 없습니다."),
+    TEAM_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 팀이 없습니다."),
+
+    DUPLICATED_POSITION_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 직급명 입니다."),
+    DUPLICATED_JOB_TITLE_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 직책명 입니다."),
+    DUPLICATED_USER_TYPE_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 사용자 유형 입니다."),
     /**
      * 500 :  Database, Server 오류
      */

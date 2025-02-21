@@ -35,7 +35,7 @@ public class User extends BaseEntity {
     @Column(name = "account_id", nullable = false)
     private String accountId;
 
-    @Column(name = "private_email", nullable = false)
+    @Column(name = "private_email")
     private String privateEmail;
 
     @Column(name = "role", nullable = false)
@@ -66,5 +66,23 @@ public class User extends BaseEntity {
 
     public void patchUsername(String username) {
         this.username = username;
+    }
+
+    public void setUserStatus(Status status) {
+        this.status = status;
+    }
+
+    public ArchivingUser toArchivingUser() {
+        return ArchivingUser.builder()
+                .username(this.username)
+                .password(this.password)
+                .accountId(this.accountId)
+                .privateEmail(this.privateEmail)
+                .role(this.role)
+                .profileImage(this.profileImage)
+                .phone(this.phone)
+                .isTeamCreated(this.isTeamCreated)
+                .team(this.team)
+                .build();
     }
 }

@@ -139,9 +139,9 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         // 5. 해당 유저 Employee 정보 저장
-        Position defaultPosition = positionRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.POSITION_NOT_FOUND));
-        JobTitle defaultJobTitle = jobTitleRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.JOB_TITLE_NOT_FOUND));
-        UserType defaultUserType = userTypeRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.USER_TYPE_NOT_FOUND));
+        Position defaultPosition = positionRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
+        JobTitle defaultJobTitle = jobTitleRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_JOB_TITLE));
+        UserType defaultUserType = userTypeRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
 
         Employee signUpEmployee = Employee.builder()
                 .user(signUpUser)
