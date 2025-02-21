@@ -1,19 +1,13 @@
 package com.elice.iliceworksbe.common.constant;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum ContentType {
-    APPLICATION_JSON("application/json"),
-    APPLICATION_X_WWW_FORM_URLENCODED("application/x-www-form-urlencoded");
+    @JsonProperty("application/x-www-form-urlencoded")
+    APPLICATION_X_WWW_FORM_URLENCODED,
 
-    private final String value;
-
-    ContentType(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+    @JsonProperty("application/json")
+    APPLICATION_JSON
 }
 
