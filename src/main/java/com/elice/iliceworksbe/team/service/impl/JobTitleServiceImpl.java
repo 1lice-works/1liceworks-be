@@ -24,9 +24,8 @@ public class JobTitleServiceImpl implements JobTitleService {
     @Transactional
     @Override
     public JobTitleResponseDto postJobTitle(JobTitleRequestDto jobTitleRequestDto) {
-        boolean condition = jobTitleRepository.existsByName(jobTitleRequestDto.name());
 
-        if (condition) {
+        if (jobTitleRepository.existsByName(jobTitleRequestDto.name())) {
             throw new BaseException(ErrorCode.DUPLICATED_JOB_TITLE_NAME);
         }
 

@@ -24,9 +24,8 @@ public class UserTypeServiceImpl implements UserTypeService{
     @Transactional
     @Override
     public UserTypeResponseDto postUserType(UserTypeRequestDto userTypeRequestDto) {
-        boolean condition = userTypeRepository.existsByName(userTypeRequestDto.name());
 
-        if (condition) {
+        if (userTypeRepository.existsByName(userTypeRequestDto.name())) {
             throw new BaseException(ErrorCode.DUPLICATED_USER_TYPE_NAME);
         }
 

@@ -24,9 +24,8 @@ public class PositionServiceImpl implements PositionService {
     @Transactional
     @Override
     public PositionResponseDto postPosition(PositionRequestDto positionRequestDto) {
-        boolean condition = positionRepository.existsByName(positionRequestDto.name());
 
-        if (condition) {
+        if (positionRepository.existsByName(positionRequestDto.name())) {
             throw new BaseException(ErrorCode.DUPLICATED_POSITION_NAME);
         }
 
