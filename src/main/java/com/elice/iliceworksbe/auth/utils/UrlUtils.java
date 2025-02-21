@@ -5,7 +5,8 @@ public class UrlUtils {
     public static final String[] PermittedUrl = {
             "/api/auth/verify-email",
             "/api/auth/verify",
-            "/api/auth/reset-password",
+            "/api/auth/verify-email-password",
+            "/api/auth/change-password/by-email",
             "/api/auth/signup",
             "/api/auth/login",
             "/api/auth/refresh-token",

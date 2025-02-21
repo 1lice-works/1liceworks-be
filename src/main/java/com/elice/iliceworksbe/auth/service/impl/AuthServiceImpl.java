@@ -74,6 +74,15 @@ public class AuthServiceImpl implements AuthService {
         }
 
         // 2. 인증코드 전송
+        sendVerificationCodeByEmail(verifyEmailRequestDto);
+    }
+
+    @Override
+    public void verifyEmailPassword(VerifyEmailRequestDto verifyEmailRequestDto) {
+        sendVerificationCodeByEmail(verifyEmailRequestDto);
+    }
+
+    private void sendVerificationCodeByEmail(VerifyEmailRequestDto verifyEmailRequestDto) {
         String verificationCode = generateVerificationCode();
         emailService.sendEmail(verifyEmailRequestDto.email(), "1liceworks 인증코드 이메일", verificationCode);
         redisDAO.setValues(verifyEmailRequestDto.email(), verificationCode, 300000L); // 5분간 인증 설정
@@ -84,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
     public void confirmVerificationCode(ConfirmEmailRequestDto confirmEmailRequestDto) {
         String email = confirmEmailRequestDto.email();
         String savedVerificationCode = redisDAO.getValues(email);
-        if(!savedVerificationCode.equals(confirmEmailRequestDto.verificationCode())){
+        if(savedVerificationCode == null || !savedVerificationCode.equals(confirmEmailRequestDto.verificationCode())){
             throw new BaseException(ErrorCode.WRONG_AUTH_CODE);
         }
         redisDAO.setValues(email, "VERIFIED", 300000L); // 5분간 해당 이메일이 인증됐음을 설정
@@ -139,9 +148,9 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         // 5. 해당 유저 Employee 정보 저장
-        Position defaultPosition = positionRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.POSITION_NOT_FOUND));
-        JobTitle defaultJobTitle = jobTitleRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.JOB_TITLE_NOT_FOUND));
-        UserType defaultUserType = userTypeRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.USER_TYPE_NOT_FOUND));
+        Position defaultPosition = positionRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
+        JobTitle defaultJobTitle = jobTitleRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_JOB_TITLE));
+        UserType defaultUserType = userTypeRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
 
         Employee signUpEmployee = Employee.builder()
                 .user(signUpUser)
@@ -285,6 +294,31 @@ public class AuthServiceImpl implements AuthService {
         return jwtTokenProvider.generateAccessToken(user.getAccountId(), user.getId(), List.of(new SimpleGrantedAuthority(user.getRole().name())));
     }
 
+    @Override
+    public void changePasswordByEmail(ChangePasswordRequestDto changePasswordRequestDto) {
+
+        // 0. 유저 찾기
+        User user = userRepository.findByAccountId(changePasswordRequestDto.accountId()).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+
+        // 1. 해당 유저의 개인 이메일이 맞는지 확인
+        if (!user.getPrivateEmail().equals(changePasswordRequestDto.privateEmail())) {
+            throw new BaseException(ErrorCode.NOT_FIND_USER);
+        }
+
+        // 2. 해당 이메일이 인증됐는지 여부 확인
+        String checkEmail = redisDAO.getValues(changePasswordRequestDto.privateEmail());
+        if(checkEmail == null || !checkEmail.equals("VERIFIED")) {
+            throw new BaseException(ErrorCode.UNVERIFIED_EMAIL);
+        }
+
+        // 3. 이전 비밀번호와 동일한지 확인
+        if (passwordEncoder.matches(changePasswordRequestDto.newPassword(), user.getPassword())) {
+            throw new BaseException(ErrorCode.MATCH_BEFORE_PASSWORD);
+        }
+
+        user.changePassword(passwordEncoder.encode(changePasswordRequestDto.newPassword()));
+        userRepository.save(user);
+    }
 
     private void invalidateAccessToken(HttpServletRequest request) {
         String accessToken = jwtTokenProvider.resolveAccessToken(request);

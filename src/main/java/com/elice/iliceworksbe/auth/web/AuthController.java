@@ -33,7 +33,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @Operation(summary = "RefreshToken을 통한 AccessToken 발급 요청 (AT X, RT O)", security = {},description = "RefreshToken을 통한 AccessToken 발급 요청합니다.")
+    @Operation(summary = "RefreshToken을 통한 AccessToken 발급 요청 (AT X, RT O)", description = "RefreshToken을 통한 AccessToken 발급 요청합니다.")
     @GetMapping("/refresh-token")
     public BaseResponse<?> refreshAccessToken(HttpServletRequest request) {
 
@@ -69,37 +69,51 @@ public class AuthController {
         return new BaseResponse<>(ErrorCode.NO_CONTENT);
     }
 
-    @Operation(summary = "일반 이메일 로그인 요청 (AT X)", security = {}, description = "일반 이메일 로그인을 합니다.")
+    @Operation(summary = "일반 이메일 로그인 요청 (AT X)", description = "일반 이메일 로그인을 합니다.")
     @PostMapping("/login")
     public BaseResponse<String> login(@RequestBody @Valid LoginRequestDto loginRequestDTO) {
         // Swagger 용. 실제 구현은 Filter에 존재
         return new BaseResponse<>(ErrorCode.SUCCESS);
     }
 
-    @Operation(summary = "accountId 중복 여부 확인", security = {}, description = "해당 계정ID을 입력하고 가입된 계정ID인지 확인합니다. true인 경우, 이미 가입된 이메일입니다.")
+    @Operation(summary = "accountId 중복 여부 확인", description = "해당 계정ID을 입력하고 가입된 계정ID인지 확인합니다. true인 경우, 이미 가입된 이메일입니다.")
     @PostMapping("/validate-email")
     public BaseResponse<Boolean> checkDuplicateAccountId(@RequestBody @Valid CheckDuplicateAccountIdRequestDto checkDuplicateAccountIdRequestDTO) {
         return new BaseResponse<>(authService.checkDuplicateAccountId(checkDuplicateAccountIdRequestDTO));
     }
 
-    @Operation(summary = "이메일 인증 코드 발급 요청", security = {},description = "이메일 인증을 위한 인증 코드를 발급 요청합니다.")
+    @Operation(summary = "이메일 인증 코드 발급 요청", description = "이메일 인증을 위한 인증 코드를 발급 요청합니다.")
     @PostMapping("/verify-email")
     public BaseResponse<String> verifyEmail(@RequestBody @Valid VerifyEmailRequestDto verifyEmailRequestDto) {
         authService.verifyEmail(verifyEmailRequestDto);
         return new BaseResponse<>(ErrorCode.SUCCESS);
     }
 
-    @Operation(summary = "이메일 인증 코드 확인 요청 (AT X)", security = {},description = "인증 코드가 올바른지 확인하는 요청입니다.")
+    @Operation(summary = "이메일 인증 코드 확인 요청 (AT X)", description = "인증 코드가 올바른지 확인하는 요청입니다.")
     @PostMapping("/verify")
     public BaseResponse<String> confirmVerificationCode(@RequestBody @Valid ConfirmEmailRequestDto confirmEmailRequestDto) {
         authService.confirmVerificationCode(confirmEmailRequestDto);
         return new BaseResponse<>(ErrorCode.SUCCESS);
     }
 
-    @Operation(summary = "이메일 일반 회원가입 (AT X)", security = {}, description = "이메일 인증을 통한 팀장의 회원가입입니다.")
+    @Operation(summary = "이메일 일반 회원가입 (AT X)", description = "이메일 인증을 통한 팀장의 회원가입입니다.")
     @PostMapping(value = "/signup")
     public BaseResponse<String> signup(@RequestBody @Valid SignUpRequestDto signUpRequestDto) {
         authService.signUp(signUpRequestDto);
+        return new BaseResponse<>(ErrorCode.SUCCESS);
+    }
+
+    @Operation(summary = "비밀번호 변경을 위한 이메일 인증 코드 발급 요청", description = "비밀번호 변경 시 이메일 인증을 위한 인증 코드를 발급 요청합니다.")
+    @PostMapping("/verify-email-password")
+    public BaseResponse<String> verifyEmailPassword(@RequestBody @Valid VerifyEmailRequestDto verifyEmailRequestDto) {
+        authService.verifyEmailPassword(verifyEmailRequestDto);
+        return new BaseResponse<>(ErrorCode.SUCCESS);
+    }
+
+    @Operation(summary = "이메일 인증으로 비밀번호 변경 요청", description = "비밀번호 찾기 요청 시 새로운 비밀번호로 변경합니다.")
+    @PostMapping("/change-password/by-email")
+    public BaseResponse<?> changePasswordByEmail(@RequestBody @Valid ChangePasswordRequestDto changePasswordRequestDto) {
+        authService.changePasswordByEmail(changePasswordRequestDto);
         return new BaseResponse<>(ErrorCode.SUCCESS);
     }
 
