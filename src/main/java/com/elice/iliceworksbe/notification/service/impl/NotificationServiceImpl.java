@@ -6,6 +6,7 @@ import com.elice.iliceworksbe.auth.repository.UserRepository;
 import com.elice.iliceworksbe.common.exception.BaseException;
 import com.elice.iliceworksbe.common.exception.ErrorCode;
 import com.elice.iliceworksbe.notification.dto.request.NotificationRequestDto;
+import com.elice.iliceworksbe.notification.dto.response.EventReminderResponseDto;
 import com.elice.iliceworksbe.notification.dto.response.NotificationResponseDto;
 import com.elice.iliceworksbe.notification.entity.Notification;
 import com.elice.iliceworksbe.notification.repository.NotificationRepository;
@@ -14,11 +15,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -113,7 +118,11 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
-    //Notification 테이블에 insert
+    /**
+     * Notification 테이블에 insert
+     * @param requestDto
+     * @return
+     */
     private NotificationResponseDto postNotification(NotificationRequestDto requestDto) {
         User user = userRepository.findById(requestDto.userId())
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
@@ -125,5 +134,23 @@ public class NotificationServiceImpl implements NotificationService {
         return NotificationResponseDto.from(savedNotification);
     }
 
+    /**
+     * Notification 테이블 조회 (최대 50개, 최대 1달)
+     * @param userId
+     * @return
+     */
+    @Override
+    @Transactional
+    public List<NotificationResponseDto> getNotifications(Long userId) {
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
+
+        //DB에서 isRead = false인 알림 업데이트
+        notificationRepository.markAllAsReadByUserId(userId);
+
+        return notificationRepository.findTop50ByUserIdAndCreatedAtAfterOrderByCreatedAtDesc(userId, oneMonthAgo)
+                .stream()
+                .map(NotificationResponseDto::from)
+                .collect(Collectors.toList());
+    }
 
 }

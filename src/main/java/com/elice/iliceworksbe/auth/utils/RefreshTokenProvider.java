@@ -5,6 +5,8 @@ import com.elice.iliceworksbe.auth.entity.AuthToken;
 import com.elice.iliceworksbe.auth.entity.User;
 import com.elice.iliceworksbe.auth.repository.AuthTokenRepository;
 import com.elice.iliceworksbe.auth.repository.UserRepository;
+import com.elice.iliceworksbe.common.exception.BaseException;
+import com.elice.iliceworksbe.common.exception.ErrorCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -47,7 +49,7 @@ public class RefreshTokenProvider {
     // AccessToken 발급을 위한 User 조회를 동시에 진행.
     public User validateRefreshToken(String refreshToken) {
         AuthToken authToken = authTokenRepository.findByTokenWithUser(refreshToken)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
 
         if(LocalDateTime.now().isBefore(authToken.getExpiresAt())) {
             return authToken.getUser();

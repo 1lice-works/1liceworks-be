@@ -126,4 +126,7 @@ public class JwtTokenProvider {
                 : null;
     }
 
+    public Long getAccessTokenExpiration() {
+        return tokenProperty.getAccessTokenExpiration();
+    }
 }
