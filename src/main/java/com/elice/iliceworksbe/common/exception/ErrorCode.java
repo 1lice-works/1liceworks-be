@@ -28,6 +28,7 @@ public enum ErrorCode {
     POST_USERS_INVALID_EMAIL(false, HttpStatus.BAD_REQUEST.value(), "이메일 형식을 확인해주세요."),
     POST_USERS_EXISTS_ACCOUNTID(false,HttpStatus.BAD_REQUEST.value(),"중복된 계정ID입니다."),
     POST_TEST_EXISTS_MEMO(false,HttpStatus.BAD_REQUEST.value(),"중복된 메모입니다."),
+    INVALID_CONTENT_TYPE(false, HttpStatus.BAD_REQUEST.value(), "잘못된 Content-Type 입니다."),
 
     WRONG_AUTH_CODE(false, HttpStatus.CONFLICT.value(), "잘못된 인증코드입니다."),
 
