@@ -76,7 +76,7 @@ public class TeamServiceImpl implements TeamService {
         return TeamMemberResponseDto.of(member, generatedPassword);
     }
 
-    private static Calendar addNewCalendar(TeamMemberRequestDto teamMemberRequestDto, User member) {
+    private Calendar addNewCalendar(TeamMemberRequestDto teamMemberRequestDto, User member) {
         return Calendar.builder()
                 .name(makeCalendarName(teamMemberRequestDto.userName()))
                 .type(CalendarType.MEMBER)
@@ -84,11 +84,11 @@ public class TeamServiceImpl implements TeamService {
                 .build();
     }
 
-    private static String makeCalendarName(String userName) {
+    private String makeCalendarName(String userName) {
         return userName + CALENDAR_NAME;
     }
 
-    private static Employee addNewEmployee(User member, UserType userType, Position position, JobTitle jobTitle) {
+    private Employee addNewEmployee(User member, UserType userType, Position position, JobTitle jobTitle) {
         return Employee.builder()
                 .user(member)
                 .userType(userType)
@@ -170,7 +170,7 @@ public class TeamServiceImpl implements TeamService {
         return TeamMemberDetailResponseDto.of(memberUser, employee);
     }
 
-    private static void patchEmployeeInfo(TeamMemberInfoUpdateDto teamMemberInfoUpdateDto, Employee employee, UserType userType, Position position, JobTitle jobTitle) {
+    private void patchEmployeeInfo(TeamMemberInfoUpdateDto teamMemberInfoUpdateDto, Employee employee, UserType userType, Position position, JobTitle jobTitle) {
         employee.patchEmployeeInfo(
                 teamMemberInfoUpdateDto,
                 jobTitle,
