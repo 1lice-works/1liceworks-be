@@ -72,6 +72,15 @@ public class EventReminderServiceImpl implements EventReminderService {
     }
 
     /**
+     * 일정에 있는 EventReminder 모두 삭제
+     * @param eventId
+     */
+    @Override
+    public void deleteAllEventReminderByEventId(Long eventId) {
+        eventReminderRepository.deleteByEventId(eventId);
+    }
+
+    /**
      * notifyTime이 현재 시간과 일치하는 알림을 사용자에게 전송
      */
     @Override
