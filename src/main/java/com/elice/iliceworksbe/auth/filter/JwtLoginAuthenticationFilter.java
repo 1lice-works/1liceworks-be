@@ -4,6 +4,7 @@ import com.elice.iliceworksbe.auth.dto.request.LoginRequestDto;
 import com.elice.iliceworksbe.auth.model.UserDetailsImpl;
 import com.elice.iliceworksbe.auth.utils.JwtTokenProvider;
 import com.elice.iliceworksbe.auth.utils.RefreshTokenProvider;
+import com.elice.iliceworksbe.notification.service.NotificationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,10 +25,13 @@ public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthentication
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
+    private final NotificationService notificationService;
 
-    public JwtLoginAuthenticationFilter(JwtTokenProvider jwtTokenProvider, RefreshTokenProvider refreshTokenProvider) {
+    public JwtLoginAuthenticationFilter(JwtTokenProvider jwtTokenProvider, RefreshTokenProvider refreshTokenProvider,
+                                        NotificationService notificationService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.refreshTokenProvider = refreshTokenProvider;
+        this.notificationService = notificationService;
         setFilterProcessesUrl("/api/auth/login"); // 로그인 경로 설정
     }
 
@@ -66,6 +70,9 @@ public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthentication
 
         // 리프레시 토큰을 쿠키로 설정
         refreshTokenProvider.setRefreshTokenCookie(response, refreshToken);
+
+        notificationService.createEmitter(userDetails.getUserId());
+        log.info("User {}: SSE 연결 완료", userDetails.getUserId());
 
         // 액세스 토큰 JWT를 클라이언트에 반환
         response.setContentType("application/json");

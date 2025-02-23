@@ -5,6 +5,7 @@ import com.elice.iliceworksbe.auth.filter.JwtLoginAuthenticationFilter;
 import com.elice.iliceworksbe.auth.utils.JwtTokenProvider;
 import com.elice.iliceworksbe.auth.utils.RefreshTokenProvider;
 import com.elice.iliceworksbe.auth.utils.UrlUtils;
+import com.elice.iliceworksbe.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +33,7 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final NotificationService notificationService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -58,7 +60,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtLoginAuthenticationFilter jwtLoginAuthenticationFilter() throws Exception {
-        JwtLoginAuthenticationFilter filter = new JwtLoginAuthenticationFilter(jwtTokenProvider, refreshTokenProvider);
+        JwtLoginAuthenticationFilter filter = new JwtLoginAuthenticationFilter(jwtTokenProvider, refreshTokenProvider, notificationService);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }

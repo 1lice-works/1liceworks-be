@@ -45,7 +45,7 @@ public class EventReminderServiceImpl implements EventReminderService {
     public List<EventReminderResponseDto> postEventReminder(Long eventId, List<EventReminderRequestDto> requestDtos) {
 
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new BaseException(ErrorCode.EVENT_NOT_FOUND));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_EVENT));
         List<EventReminderResponseDto> responseDtos = new ArrayList<>();
 
         for (EventReminderRequestDto requestDto : requestDtos) {

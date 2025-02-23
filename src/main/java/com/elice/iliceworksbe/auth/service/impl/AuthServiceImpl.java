@@ -16,6 +16,7 @@ import com.elice.iliceworksbe.common.exception.ErrorCode;
 import com.elice.iliceworksbe.common.model.RedisDAO;
 import com.elice.iliceworksbe.common.service.EmailService;
 import com.elice.iliceworksbe.common.service.FirebaseStorageService;
+import com.elice.iliceworksbe.notification.service.NotificationService;
 import com.elice.iliceworksbe.team.entity.*;
 import com.elice.iliceworksbe.team.repository.*;
 import jakarta.servlet.http.Cookie;
@@ -51,6 +52,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserTypeRepository userTypeRepository;
     private final AuthTokenRepository authTokenRepository;
 
+    private final NotificationService notificationService;
     private final FirebaseStorageService firebaseStorageService;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
@@ -94,7 +96,7 @@ public class AuthServiceImpl implements AuthService {
         String email = confirmEmailRequestDto.email();
         String savedVerificationCode = redisDAO.getValues(email);
         if(savedVerificationCode == null || !savedVerificationCode.equals(confirmEmailRequestDto.verificationCode())){
-            throw new BaseException(ErrorCode.WRONG_AUTH_CODE);
+            throw new BaseException(ErrorCode.INVALID_AUTH_CODE);
         }
         redisDAO.setValues(email, "VERIFIED", 300000L); // 5분간 해당 이메일이 인증됐음을 설정
     }
@@ -115,7 +117,7 @@ public class AuthServiceImpl implements AuthService {
 
         // 2. 계정ID 중복 확인
         if (userRepository.existsByAccountId(signUpRequestDto.userInfo().accountId())){
-            throw new BaseException(ErrorCode.DUPLICATED_ACCOUNTID);
+            throw new BaseException(ErrorCode.DUPLICATED_ACCOUNT_ID);
         }
 
         // 3. 개인 이메일 중복 확인
@@ -148,9 +150,9 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         // 5. 해당 유저 Employee 정보 저장
-        Position defaultPosition = positionRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
-        JobTitle defaultJobTitle = jobTitleRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_JOB_TITLE));
-        UserType defaultUserType = userTypeRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
+        Position defaultPosition = positionRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_POSITION));
+        JobTitle defaultJobTitle = jobTitleRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_JOB_TITLE));
+        UserType defaultUserType = userTypeRepository.findById(1L).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER_TYPE));
 
         Employee signUpEmployee = Employee.builder()
                 .user(signUpUser)
@@ -168,7 +170,7 @@ public class AuthServiceImpl implements AuthService {
     public List<GetProfileResponseDto> getAllMemberProfiles(Long userId) {
 
         // 1. 현재 유저의 팀 정보 조회
-        Team team = userRepository.findById(userId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER)).getTeam();
+        Team team = userRepository.findById(userId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER)).getTeam();
 
         // 2. 해당 팀에 속하는 모든 유저 조회
         List<User> userList = userRepository.findByTeam(team);
@@ -177,7 +179,7 @@ public class AuthServiceImpl implements AuthService {
         List<GetProfileResponseDto> memberProfiles = new ArrayList<>();
 
         for(User user : userList) {
-            Employee employee = employeeRepository.findEmployeeByUser(user).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+            Employee employee = employeeRepository.findEmployeeByUser(user).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
             memberProfiles.add(GetProfileResponseDto.of(user, employee));
         }
 
@@ -186,8 +188,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public GetProfileResponseDto getMyProfile(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
-        Employee employee = employeeRepository.findEmployeeByUser(user).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
+        Employee employee = employeeRepository.findEmployeeByUser(user).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         return GetProfileResponseDto.of(user, employee);
     }
@@ -197,8 +199,8 @@ public class AuthServiceImpl implements AuthService {
     public void patchMyProfile(Long userId, PatchProfileRequestDto patchProfileRequestDto, MultipartFile profileImage) {
 
         // 0. 내 정보 가져오기
-        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
-        Employee employee = employeeRepository.findEmployeeByUser(user).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
+        Employee employee = employeeRepository.findEmployeeByUser(user).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         // 1. 프로필 이미지 수정
         String originalProfileImageUrl = user.getProfileImage();
@@ -217,7 +219,7 @@ public class AuthServiceImpl implements AuthService {
                 updatedProfileImageUrl = null;
             }
         } catch (IOException e) {
-            throw new BaseException(ErrorCode.IMAGE_UPLOAD_FAILED);
+            throw new BaseException(ErrorCode.FAILED_TO_UPLOAD_IMAGE);
         }
 
         // 2. 프로필 수정
@@ -232,22 +234,22 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void patchMemberProfile(Long leaderUserId, Long memberUserId, PatchMemberProfileRequestDto patchProfileRequestDto) {
         // 1. leaderUserId로 팀 조회
-        Team team = userRepository.findById(leaderUserId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER)).getTeam();
+        Team team = userRepository.findById(leaderUserId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER)).getTeam();
 
         // 2. 해당 팀에 userId가 존재하는지 확인
-        User memberUser = userRepository.findById(memberUserId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+        User memberUser = userRepository.findById(memberUserId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         if (!memberUser.getTeam().equals(team)) {
-            throw new BaseException(ErrorCode.WRONG_AUTHORIZATION);
+            throw new BaseException(ErrorCode.INVALID_AUTHORIZATION);
         }
 
         // 3. employee 정보 조회
-        Employee employee = employeeRepository.findEmployeeByUser(memberUser).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+        Employee employee = employeeRepository.findEmployeeByUser(memberUser).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         // 4. position, jobtitle, usertype 조회
-        Position patchedPosition = positionRepository.findByName(patchProfileRequestDto.position()).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_POSITION));
-        JobTitle patchedJobTitle = jobTitleRepository.findByName(patchProfileRequestDto.jobTitle()).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_JOB_TITLE));
-        UserType patchedUserType = userTypeRepository.findByName(patchProfileRequestDto.userType()).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER_TYPE));
+        Position patchedPosition = positionRepository.findByName(patchProfileRequestDto.position()).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_POSITION));
+        JobTitle patchedJobTitle = jobTitleRepository.findByName(patchProfileRequestDto.jobTitle()).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_JOB_TITLE));
+        UserType patchedUserType = userTypeRepository.findByName(patchProfileRequestDto.userType()).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER_TYPE));
 
         // 5. 해당 user 정보 변경
         memberUser.patchUsername(patchProfileRequestDto.username());
@@ -278,6 +280,9 @@ public class AuthServiceImpl implements AuthService {
 
         // 3. RefreshToken 쿠키 제거
         invalidateRefreshToken(response);
+        notificationService.disconnect(userId);
+
+        log.info("User {} 로그아웃 및 SSE 연결 해제 완료", userId);
     }
 
     @Override
@@ -298,11 +303,11 @@ public class AuthServiceImpl implements AuthService {
     public void changePasswordByEmail(ChangePasswordRequestDto changePasswordRequestDto) {
 
         // 0. 유저 찾기
-        User user = userRepository.findByAccountId(changePasswordRequestDto.accountId()).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+        User user = userRepository.findByAccountId(changePasswordRequestDto.accountId()).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 
         // 1. 해당 유저의 개인 이메일이 맞는지 확인
         if (!user.getPrivateEmail().equals(changePasswordRequestDto.privateEmail())) {
-            throw new BaseException(ErrorCode.NOT_FIND_USER);
+            throw new BaseException(ErrorCode.NOT_FOUND_USER);
         }
 
         // 2. 해당 이메일이 인증됐는지 여부 확인
@@ -313,7 +318,7 @@ public class AuthServiceImpl implements AuthService {
 
         // 3. 이전 비밀번호와 동일한지 확인
         if (passwordEncoder.matches(changePasswordRequestDto.newPassword(), user.getPassword())) {
-            throw new BaseException(ErrorCode.MATCH_BEFORE_PASSWORD);
+            throw new BaseException(ErrorCode.FAILED_TO_MATCH_BEFORE_PASSWORD);
         }
 
         user.changePassword(passwordEncoder.encode(changePasswordRequestDto.newPassword()));
