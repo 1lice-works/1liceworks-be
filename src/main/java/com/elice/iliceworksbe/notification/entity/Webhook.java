@@ -22,19 +22,19 @@ public class Webhook extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "webhook_id")
+    @Column(name = "webhook_id", nullable = false)
     private Long id;
 
-    @Column(name = "payload_url")
+    @Column(name = "payload_url", nullable = false)
     private String payloadUrl;
 
-    @Column(name = "content_type")
+    @Column(name = "content_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private ContentType contentType;
 
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "calendar_id")
+    @JoinColumn(name = "calendar_id", nullable = false)
     private Calendar calendar;
 
     public static Webhook from(WebhookRequestDto requestDto){

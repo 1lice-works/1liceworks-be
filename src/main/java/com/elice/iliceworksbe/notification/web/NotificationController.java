@@ -9,6 +9,7 @@ import com.elice.iliceworksbe.notification.service.NotificationService;
 import com.elice.iliceworksbe.notification.service.WebhookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -44,19 +45,12 @@ public class NotificationController {
         return new BaseResponse<>(getResponseDtos);
     }
 
-    /**
-     * 웹훅 등록
-     *
-     * @param userDetails
-     * @param requestDto
-     * @return
-     */
     @Operation(summary = "웹훅 등록", description = "웹훅을 등록합니다.")
     @PreAuthorize("hasAuthority('LEADER')")
     @PostMapping("/webhook")
     public BaseResponse<WebhookResponseDto> postWebhook(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestBody WebhookRequestDto requestDto) {
+            @Valid @RequestBody WebhookRequestDto requestDto) {
         Long userId = userDetails.getUserId();
         WebhookResponseDto postResponseDto = webhookService.postWebhook(userId, requestDto);
         return new BaseResponse<>(postResponseDto);

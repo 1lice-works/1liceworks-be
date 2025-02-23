@@ -4,7 +4,6 @@ import com.elice.iliceworksbe.auth.repository.UserRepository;
 import com.elice.iliceworksbe.calendar.entity.Calendar;
 import com.elice.iliceworksbe.calendar.repository.CalendarRepository;
 import com.elice.iliceworksbe.common.constant.CalendarType;
-import com.elice.iliceworksbe.common.constant.ContentType;
 import com.elice.iliceworksbe.common.exception.BaseException;
 import com.elice.iliceworksbe.common.exception.ErrorCode;
 import com.elice.iliceworksbe.notification.dto.request.WebhookMessageDto;
@@ -20,16 +19,10 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.io.IOException;
-import java.net.http.HttpClient;
-import java.util.Optional;
 
 
 @Slf4j
@@ -42,7 +35,6 @@ public class WebhookServiceImpl implements WebhookService {
 
     /**
      * 웹훅 등록
-     *
      * @param userId
      * @param requestDto
      * @return
@@ -72,6 +64,12 @@ public class WebhookServiceImpl implements WebhookService {
         return WebhookResponseDto.from(savedWebhook);
     }
 
+    /**
+     * 웹훅 전송
+     * @param calendarId
+     * @param webhookMessageDto
+     * @return
+     */
     @Override
     public boolean sendWebhookMessage(Long calendarId, WebhookMessageDto webhookMessageDto) {
 
