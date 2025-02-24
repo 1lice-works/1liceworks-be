@@ -1,50 +1,75 @@
 package com.elice.iliceworksbe.ai.service.impl;
 
+import com.elice.iliceworksbe.ai.config.property.AIProperty;
 import com.elice.iliceworksbe.ai.service.AIService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AIServiceImpl implements AIService {
 
-    private static final String FLASK_URL = "http://34.22.92.60:5000";
+    private final AIProperty aiProperty;
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public String generateSchedule(String prompt) {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        try {
+            String url = aiProperty.getFlaskUrl() + "/generate_schedule";
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("prompt", prompt);
 
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("prompt", prompt);
+            String requestBodyJson = objectMapper.writeValueAsString(requestBody);
 
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<String> response = restTemplate.postForEntity(FLASK_URL + "/generate_schedule", request, String.class);
-        log.info("prompt: " + prompt);
-        return response.getBody();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBodyJson, StandardCharsets.UTF_8))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            log.info("generateSchedule Response: {}", response.body());
+            return response.body();
+        } catch (Exception e) {
+            log.error("Error in generateSchedule: ", e);
+            return "{}";
+        }
     }
 
     @Override
     public String findFreeTime(Map<String, Object> calendarData) {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        try {
+            String url = aiProperty.getFlaskUrl() + "/find_free_time";
 
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(calendarData, headers);
-        ResponseEntity<String> response = restTemplate.postForEntity(FLASK_URL + "/find_free_time", request, String.class);
+            String requestBodyJson = objectMapper.writeValueAsString(calendarData);
 
-        log.info("Find Free Time Request: {}", calendarData);
-        return response.getBody();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBodyJson, StandardCharsets.UTF_8))
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            log.info("findFreeTime Response: {}", response.body());
+            return response.body();
+        } catch (Exception e) {
+            log.error("Error in findFreeTime: ", e);
+            return "{}";
+        }
     }
 }
