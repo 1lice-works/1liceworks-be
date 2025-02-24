@@ -29,6 +29,7 @@ public enum ErrorCode {
     NOT_FOUND_CALENDAR(false, HttpStatus.NOT_FOUND.value(), "캘린더를 찾을 수 없습니다."),
     NOT_FOUND_TEAM(false, HttpStatus.NOT_FOUND.value(), "팀을 찾을 수 없습니다."),
     NOT_FOUND_EVENT(false, HttpStatus.NOT_FOUND.value(), "일정을 찾을 수 없습니다."),
+    NOT_FOUND_WEBHOOK(false, HttpStatus.NOT_FOUND.value(), "웹훅을 찾을 수 없습니다."),
 
     FAILED_TO_FIND_RESPONSE(false, HttpStatus.NOT_FOUND.value(), "값을 불러오는데 실패하였습니다."),
     FAILED_TO_LOGIN(false, HttpStatus.NOT_FOUND.value(), "없는 아이디거나 비밀번호가 틀렸습니다."),
@@ -37,6 +38,7 @@ public enum ErrorCode {
     FAILED_TO_UPLOAD_IMAGE(false, HttpStatus.BAD_REQUEST.value(), "이미지 업로드에 실패했습니다."),
 
     INVALID_AUTH_CODE(false, HttpStatus.CONFLICT.value(), "잘못된 인증코드입니다."),
+    INVALID_CONTENT_TYPE(false, HttpStatus.CONFLICT.value(), "잘못된 Content-Type입니다."),
     INVALID_JWT(false, HttpStatus.UNAUTHORIZED.value(), "유효하지 않은 JWT입니다."),
     INVALID_USER_JWT(false, HttpStatus.FORBIDDEN.value(), "권한이 없는 유저의 접근입니다."),
     INVALID_EMAIL_FORMAT(false, HttpStatus.BAD_REQUEST.value(), "이메일 형식을 확인해주세요."),
