@@ -43,7 +43,7 @@ public class EventServiceImpl implements EventService {
 
         // 1. 현재 유저의 팀 조회
         Team team = userRepository.findById(userId)
-                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER))
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER))
                 .getTeam();
 
         // 2. CalendarId가 해당 유저의 팀 캘린더가 맞는지 조회
@@ -76,7 +76,7 @@ public class EventServiceImpl implements EventService {
         // 5-2. 현재 사용자가 일정 참석자 리스트에 포함되어 있지 않다면 users 리스트에 추가
         if (!participantIds.contains(userId)) {
             User currentUser = userRepository.findById(userId)
-                    .orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+                    .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
             users.add(currentUser);
         }
 
@@ -106,7 +106,7 @@ public class EventServiceImpl implements EventService {
     public void postMyEvent(Long userId, PostMyEventRequestDto postMyEventRequestDto) {
 
         // 1. 현재 유저의 캘린더 조회
-        User currentUser = userRepository.findById(userId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FIND_USER));
+        User currentUser = userRepository.findById(userId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
         Calendar myCalendar = calendarRepository.findByTypeAndTypeId(CalendarType.MEMBER, userId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CALENDAR));
 
