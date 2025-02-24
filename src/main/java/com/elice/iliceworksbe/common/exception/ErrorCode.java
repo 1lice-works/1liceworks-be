@@ -53,8 +53,6 @@ public enum ErrorCode {
     EVENT_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일정을 찾을 수 없습니다."),
     JOB_TITLE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 직책이 없습니다."),
 
-    // Calendar 관련
-    NOT_FOUND_CALENDAR(false, HttpStatus.NOT_FOUND.value(), "캘린더를 찾을 수 없습니다."),
     MUST_START_TIME_BEFORE_END_TIME(false, HttpStatus.BAD_REQUEST.value(), "일정 시작 시간은 끝 시간보다 이전에 와야합니다."),
 
     IMAGE_DELETE_FAILED(false, HttpStatus.BAD_REQUEST.value(), "이미지 삭제에 실패했습니다."),
