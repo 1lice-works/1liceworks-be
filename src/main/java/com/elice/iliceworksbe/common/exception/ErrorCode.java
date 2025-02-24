@@ -39,6 +39,7 @@ public enum ErrorCode {
     INVALID_AUTH_CODE(false, HttpStatus.CONFLICT.value(), "잘못된 인증코드입니다."),
     INVALID_JWT(false, HttpStatus.UNAUTHORIZED.value(), "유효하지 않은 JWT입니다."),
     INVALID_USER_JWT(false, HttpStatus.FORBIDDEN.value(), "권한이 없는 유저의 접근입니다."),
+    DENIED_ROLE_PERMISSION(false, HttpStatus.FORBIDDEN.value(), "해당 역할에 대한 권한이 없습니다."),
     INVALID_EMAIL_FORMAT(false, HttpStatus.BAD_REQUEST.value(), "이메일 형식을 확인해주세요."),
     INVALID_AUTHORIZATION(false, HttpStatus.CONFLICT.value(), "잘못된 권한입니다."),
 
