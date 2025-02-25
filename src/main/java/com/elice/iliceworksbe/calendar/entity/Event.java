@@ -53,7 +53,7 @@ public class Event extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private Availability availability;
 
-    @Column(name = "location", nullable = false)
+    @Column(name = "location")
     private String location;
 
     @ManyToOne(fetch = FetchType.LAZY)
