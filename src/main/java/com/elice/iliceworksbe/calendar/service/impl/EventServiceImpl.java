@@ -20,12 +20,12 @@ import com.elice.iliceworksbe.notification.dto.request.NotificationRequestDto;
 import com.elice.iliceworksbe.notification.entity.EventReminder;
 import com.elice.iliceworksbe.notification.repository.EventReminderRepository;
 import com.elice.iliceworksbe.notification.service.NotificationService;
+import com.elice.iliceworksbe.notification.service.impl.EventReminderServiceImpl;
 import com.elice.iliceworksbe.notification.utils.NotificationMessages;
 import com.elice.iliceworksbe.team.entity.Team;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,6 +41,7 @@ public class EventServiceImpl implements EventService {
     private final EventReminderRepository eventReminderRepository;
     private final EventParticipantRepository eventParticipantRepository;
     private final NotificationService notificationService;
+    private final EventReminderServiceImpl eventReminderServiceImpl;
 
     @Override
     @Transactional
@@ -287,11 +288,6 @@ public class EventServiceImpl implements EventService {
     }
 
     private void deleteEventReminder(Long eventId) {
-        try {
-            // 해당 일정의 EventReminder 삭제
-            eventReminderRepository.deleteByEventId(eventId);
-        } catch (EmptyResultDataAccessException e) {
-            log.info("eventReminderRepository.deleteByEventId({}) is empty", eventId);
-        }
+        eventReminderServiceImpl.deleteAllEventReminderByEventId(eventId);
     }
 }

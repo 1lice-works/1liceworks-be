@@ -15,6 +15,7 @@ import com.elice.iliceworksbe.notification.service.EventReminderService;
 import com.elice.iliceworksbe.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,7 +78,12 @@ public class EventReminderServiceImpl implements EventReminderService {
      */
     @Override
     public void deleteAllEventReminderByEventId(Long eventId) {
-        eventReminderRepository.deleteByEventId(eventId);
+        try {
+            // 해당 일정의 EventReminder 삭제
+            eventReminderRepository.deleteByEventId(eventId);
+        } catch (EmptyResultDataAccessException e) {
+            log.info("eventReminderRepository.deleteByEventId({}) is empty", eventId);
+        }
     }
 
     /**
