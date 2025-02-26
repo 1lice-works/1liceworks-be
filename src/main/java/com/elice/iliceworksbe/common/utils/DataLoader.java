@@ -3,10 +3,12 @@ package com.elice.iliceworksbe.common.utils;
 import com.elice.iliceworksbe.auth.entity.User;
 import com.elice.iliceworksbe.auth.repository.UserRepository;
 import com.elice.iliceworksbe.calendar.entity.Calendar;
+import com.elice.iliceworksbe.calendar.entity.Event;
+import com.elice.iliceworksbe.calendar.entity.EventParticipant;
 import com.elice.iliceworksbe.calendar.repository.CalendarRepository;
-import com.elice.iliceworksbe.common.constant.CalendarType;
-import com.elice.iliceworksbe.common.constant.Role;
-import com.elice.iliceworksbe.common.constant.Status;
+import com.elice.iliceworksbe.calendar.repository.EventParticipantRepository;
+import com.elice.iliceworksbe.calendar.repository.EventRepository;
+import com.elice.iliceworksbe.common.constant.*;
 import com.elice.iliceworksbe.team.constant.Industry;
 import com.elice.iliceworksbe.team.constant.Scale;
 import com.elice.iliceworksbe.team.entity.*;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 /*
 서버 데이터 초기화용
@@ -35,6 +38,8 @@ public class DataLoader {
     private final JobTitleRepository jobTitleRepository;
     private final UserTypeRepository userTypeRepository;
     private final UserRepository userRepository;
+    private final EventRepository eventRepository;
+    private final EventParticipantRepository eventParticipantRepository;
 
     @PostConstruct
     public void init(){
@@ -248,8 +253,281 @@ public class DataLoader {
                 .team(iliceTeamFE)
                 .build();
 
-        calendarRepository.saveAll(List.of(calendarTaeseung, calendarKwangho, calendarSugyeong, calendarHyerim, calendarKyungjun));
+
+        // 법정 공휴일 캘린더
+        Calendar otherCalendar = Calendar.builder()
+                .name("법정 공휴일")
+                .type(CalendarType.OTHER)
+                .typeId(-1L)
+                .build();
+
+        calendarRepository.saveAll(List.of(calendarTaeseung, calendarKwangho, calendarSugyeong, calendarHyerim, calendarKyungjun, otherCalendar));
+
+        Event ev1BE = Event.builder()
+                .title("팀BE 주간 회의1")
+                .description("스프린트 진행.")
+                .dtStartTime(LocalDateTime.of(2025, 2, 24, 10, 0))
+                .dtEndTime(LocalDateTime.of(2025, 2, 28, 11, 30))
+                .isAllDay(false)
+                .privacy(PrivacyType.PUBLIC)
+                .availability(Availability.BUSY)
+                .location("A동 회의실 11-1")
+                .calendar(calendarBE)
+                .build();
+
+        Event ev2BE = Event.builder()
+                .title("백엔드 기술 공유 세션")
+                .description("새로운 기술 트렌드에 대한 논의")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PUBLIC)
+                .availability(Availability.BUSY)
+                .location("A동 회의실 11-1")
+                .calendar(calendarBE)
+                .build();
+
+        Event ev3BE = Event.builder()
+                .title("팀 점심 회식")
+                .description("올해의 성과를 기념하는 식사")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PRIVATE)
+                .availability(Availability.FREE)
+                .location("강남역 근처 식당")
+                .calendar(calendarBE)
+                .build();
+
+        Event ev1FE = Event.builder()
+                .title("FE-BE 협업 미팅")
+                .description("API 스펙 조율 및 개선 논의")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PUBLIC)
+                .availability(Availability.BUSY)
+                .location("A동 회의실 10-3")
+                .calendar(calendarFE)
+                .build();
+
+        Event ev4BE = Event.builder()
+                .title("시스템 모니터링 점검")
+                .description("서버 성능 및 로그 분석")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PUBLIC)
+                .availability(Availability.BUSY)
+                .location("B동 모니터링 센터")
+                .calendar(calendarBE)
+                .build();
+
+        Event ev1Taeseung = Event.builder()
+                .title("팀 리더 전략 회의")
+                .description("다음 분기 목표 설정")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PRIVATE)
+                .availability(Availability.BUSY)
+                .location("CEO 회의실")
+                .calendar(calendarTaeseung)
+                .build();
+
+        Event ev5BE = Event.builder()
+                .title("개발자 커뮤니티 밋업")
+                .description("기술 공유 및 네트워킹")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PUBLIC)
+                .availability(Availability.FREE)
+                .location("온라인 Zoom")
+                .calendar(calendarBE)
+                .build();
+
+        Event ev6BE = Event.builder()
+                .title("DB 성능 최적화 세미나")
+                .description("데이터베이스 인덱싱 및 쿼리 튜닝")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PUBLIC)
+                .availability(Availability.BUSY)
+                .location("C동 세미나실")
+                .calendar(calendarBE)
+                .build();
+
+        Event ev7BE = Event.builder()
+                .title("팀원 1:1 면담")
+                .description("개발 진행 상황 체크 및 피드백")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PRIVATE)
+                .availability(Availability.BUSY)
+                .location("리더 오피스")
+                .calendar(calendarBE)
+                .build();
+
+        Event ev2FE = Event.builder()
+                .title("UI/UX 개선 논의")
+                .description("디자인 시스템 및 피드백 반영")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PUBLIC)
+                .availability(Availability.BUSY)
+                .location("디자인팀 회의실")
+                .calendar(calendarFE)
+                .build();
+
+        Event ev1other = Event.builder()
+                .title("법정 공휴일")
+                .description("설 연휴")
+                .dtStartTime(getRandomDateTime().toLocalDate().atStartOfDay())
+                .dtEndTime(getRandomDateTime().toLocalDate().atTime(23, 59, 59))
+                .isAllDay(true)
+                .privacy(PrivacyType.PUBLIC)
+                .availability(Availability.FREE)
+                .location("전국")
+                .calendar(otherCalendar)
+                .build();
+
+        Event ev1kwangho = Event.builder()
+                .title("치과 가기")
+                .description("보라치과")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PUBLIC)
+                .availability(Availability.BUSY)
+                .location("전국")
+                .calendar(calendarKwangho)
+                .build();
+
+        Event ev2kwangho = Event.builder()
+                .title("건강검진")
+                .description("정기 건강검진")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PRIVATE)
+                .availability(Availability.BUSY)
+                .location("서울 강남 병원")
+                .calendar(calendarKwangho)
+                .build();
+
+        Event ev3kwangho = Event.builder()
+                .title("자격증 시험")
+                .description("정보처리기사 실기 시험")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PUBLIC)
+                .availability(Availability.BUSY)
+                .location("코엑스 컨벤션센터")
+                .calendar(calendarKwangho)
+                .build();
+
+        Event ev4kwangho = Event.builder()
+                .title("친구 결혼식")
+                .description("대학교 동기 결혼식")
+                .dtStartTime(getRandomDateTime())
+                .dtEndTime(getRandomDateTime())
+                .isAllDay(false)
+                .privacy(PrivacyType.PUBLIC)
+                .availability(Availability.FREE)
+                .location("서울 신라호텔")
+                .calendar(calendarKwangho)
+                .build();
+
+        // 이벤트 저장
+        List<Event> events = List.of(ev1BE, ev2BE, ev3BE, ev1FE, ev4BE, ev1Taeseung, ev5BE, ev6BE, ev7BE, ev2FE, ev1other,
+                ev1kwangho, ev2kwangho, ev3kwangho, ev4kwangho);
+        eventRepository.saveAll(events);
 
 
+        EventParticipant ep1 = EventParticipant.builder()
+                .event(ev1BE)
+                .user(taeseungUser)
+                .build();
+
+        EventParticipant ep2 = EventParticipant.builder()
+                .event(ev2BE)
+                .user(taeseungUser)
+                .build();
+
+        EventParticipant ep3 = EventParticipant.builder()
+                .event(ev3BE)
+                .user(taeseungUser)
+                .build();
+
+        EventParticipant ep4 = EventParticipant.builder()
+                .event(ev1FE)
+                .user(hyerimUser)
+                .build();
+
+        EventParticipant ep5 = EventParticipant.builder()
+                .event(ev4BE)
+                .user(taeseungUser)
+                .build();
+
+        EventParticipant ep6 = EventParticipant.builder()
+                .event(ev1Taeseung)
+                .user(taeseungUser)
+                .build();
+
+        EventParticipant ep7 = EventParticipant.builder()
+                .event(ev5BE)
+                .user(kwanghoUser)
+                .build();
+
+        EventParticipant ep8 = EventParticipant.builder()
+                .event(ev6BE)
+                .user(kwanghoUser)
+                .build();
+
+        EventParticipant ep9 = EventParticipant.builder()
+                .event(ev7BE)
+                .user(kwanghoUser)
+                .build();
+
+        EventParticipant ep10 = EventParticipant.builder()
+                .event(ev2FE)
+                .user(kyungjunUser)
+                .build();
+
+        EventParticipant ep11 = EventParticipant.builder()
+                .event(ev1kwangho)
+                .user(kwanghoUser)
+                .build();
+
+        EventParticipant ep12 = EventParticipant.builder()
+                .event(ev2kwangho)
+                .user(kwanghoUser)
+                .build();
+
+        EventParticipant ep13 = EventParticipant.builder()
+                .event(ev3kwangho)
+                .user(kwanghoUser)
+                .build();
+
+        EventParticipant ep14 = EventParticipant.builder()
+                .event(ev4kwangho)
+                .user(kwanghoUser)
+                .build();
+
+        eventParticipantRepository.saveAll(List.of(ep1, ep2, ep3, ep4, ep5, ep6, ep7, ep8, ep9, ep10, ep11, ep12, ep13, ep14));
+
+    }
+
+    // 2024년 12월부터 2025년 3월 사이의 무작위 값 설정
+    private LocalDateTime getRandomDateTime() {
+        long startEpoch = LocalDateTime.of(2024, 12, 1, 0, 0).toEpochSecond(java.time.ZoneOffset.UTC);
+        long endEpoch = LocalDateTime.of(2025, 3, 31, 23, 59).toEpochSecond(java.time.ZoneOffset.UTC);
+        long randomEpoch = ThreadLocalRandom.current().nextLong(startEpoch, endEpoch);
+        return LocalDateTime.ofEpochSecond(randomEpoch, 0, java.time.ZoneOffset.UTC);
     }
 }
