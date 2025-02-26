@@ -1,6 +1,5 @@
 package com.elice.iliceworksbe.calendar.repository;
 
-import com.elice.iliceworksbe.calendar.entity.Event;
 import com.elice.iliceworksbe.calendar.entity.EventParticipant;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;

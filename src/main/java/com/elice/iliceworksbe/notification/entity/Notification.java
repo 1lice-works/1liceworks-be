@@ -24,20 +24,20 @@ public class Notification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notification_id")
+    @Column(name = "notification_id", nullable = false)
     private Long id;
 
-    @Column(name = "message")
+    @Column(name = "message", nullable = false)
     private String message;
 
-    @Column(name = "notify_time")
+    @Column(name = "notify_time", nullable = false)
     private LocalDateTime notifyTime;
 
-    @Column(name = "is_read")
-    private Boolean isRead;
+    @Column(name = "is_read", nullable = false)
+    private boolean isRead = false;
 
-    @Column(name = "is_sent")
-    private Boolean isSent;
+    @Column(name = "is_sent", nullable = false)
+    private boolean isSent = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

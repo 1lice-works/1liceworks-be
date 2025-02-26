@@ -26,10 +26,10 @@ import java.time.LocalDateTime;
 public class EventReminder extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "event_reminder_id")
+    @Column(name = "event_reminder_id", nullable = false)
     private Long id;
 
-    @Column(name = "notify_time")
+    @Column(name = "notify_time", nullable = false)
     private LocalDateTime notifyTime;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -49,6 +49,8 @@ public enum ErrorCode {
     DUPLICATED_POSITION_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 직급명입니다."),
     DUPLICATED_JOB_TITLE_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 직책명입니다."),
     DUPLICATED_USER_TYPE_NAME(false, HttpStatus.BAD_REQUEST.value(), "중복된 사용자 유형입니다."),
+    DUPLICATED_WEBHOOK(false, HttpStatus.BAD_REQUEST.value(), "해당 캘린더에 이미 웹훅이 등록되어 있습니다."),
+
 
     JOB_TITLE_NOT_FOUND(false, HttpStatus.NOT_FOUND.value(), "일치하는 직책이 없습니다."),
 

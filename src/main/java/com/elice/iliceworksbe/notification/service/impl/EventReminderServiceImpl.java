@@ -42,11 +42,20 @@ public class EventReminderServiceImpl implements EventReminderService {
      * @param requestDtos
      * @return
      */
+    @Transactional
     @Override
     public List<EventReminderResponseDto> postEventReminder(Long eventId, List<EventReminderRequestDto> requestDtos) {
+        Event event = findEventById(eventId);
+        return saveEventReminders(requestDtos, event);
+    }
 
+    private Event findEventById(Long eventId) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_EVENT));
+        return event;
+    }
+
+    private List<EventReminderResponseDto> saveEventReminders(List<EventReminderRequestDto> requestDtos, Event event) {
         List<EventReminderResponseDto> responseDtos = new ArrayList<>();
 
         for (EventReminderRequestDto requestDto : requestDtos) {
@@ -112,17 +121,18 @@ public class EventReminderServiceImpl implements EventReminderService {
      */
     @Transactional
     public void processEventReminder(EventReminder eventReminder) {
-        Event event = eventReminder.getEvent();
-        String message = event.getTitle();
+        Long eventId = eventReminder.getEvent().getId();
+        log.info("eventId", eventId);
+        String message = eventReminder.getEvent().getDescription();
 
-        List<EventParticipant> participants = eventParticipantRepository.findByEvent(event);
-        log.info("이벤트 '{}' 에 대한 참가자 수: {}", event.getTitle(), participants.size());
+        List<EventParticipant> participants = eventParticipantRepository.findByEventId(eventId);
+        log.info("이벤트 '{}' 에 대한 참가자 수: {}", message, participants.size());
 
         participants.forEach(participant -> {
             try {
                 NotificationRequestDto requestDto = new NotificationRequestDto(participant.getId(), message);
                 notificationService.sendNotification(requestDto);
-            } catch (Exception e){
+            } catch (Exception e) {
                 log.error("알림 전송 실패 - 사용자: {}, 오류: {}", participant.getId(), e.getMessage(), e);
             }
         });

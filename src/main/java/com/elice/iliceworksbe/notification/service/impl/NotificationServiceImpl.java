@@ -12,6 +12,7 @@ import com.elice.iliceworksbe.notification.repository.NotificationRepository;
 import com.elice.iliceworksbe.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,12 +41,25 @@ public class NotificationServiceImpl implements NotificationService {
      */
     @Override
     public SseEmitter createEmitter(Long userId) {
-        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); // 30분 유지
+
+        // 기존 Emitter가 있다면 정리 후 새로운 Emitter 생성
+        emitters.compute(userId, (key, existingEmitter) -> {
+            if (existingEmitter != null) {
+                existingEmitter.complete(); // 기존 연결 강제 종료
+            }
+            return new SseEmitter(30 * 60 * 1000L); // 30분 유지
+        });
+
+        SseEmitter emitter = emitters.get(userId);
         configureEmitter(userId, emitter);
         emitters.put(userId, emitter);
 
-        //미전송 알림 처리
+        // 미전송 알림 처리
         sendUnsentNotifications(userId, emitter);
+
+        // 클라이언트 재연결 시 읽지 않은 알림 존재 여부 전송
+        sendUnreadNotificationsStatus(userId, emitter);
+
         return emitter;
     }
 
@@ -78,6 +92,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * 미전송 알림 처리
+     *
      * @param userId
      * @param emitter
      */
@@ -90,10 +105,27 @@ public class NotificationServiceImpl implements NotificationService {
                 try {
                     emitter.send(SseEmitter.event().name("notification").data(notification.getMessage()));
                     updateNotificationStatus(notification.getId(), true);
+                    log.info("{} 전송 성공", notification.getMessage());
                 } catch (IOException e) {
                     log.warn("미전송 알림 발송 실패: {}", e.getMessage());
                 }
             });
+        }
+    }
+
+    /**
+     * 읽지 않은 알림 존재 여부 전송
+     * @param userId
+     * @param emitter
+     */
+    private void sendUnreadNotificationsStatus(Long userId, SseEmitter emitter) {
+        boolean hasUnreadNotifications = notificationRepository.existsByUserIdAndIsReadFalse(userId);
+        try {
+            emitter.send(SseEmitter.event()
+                    .name("unreadNotificationStatus")
+                    .data(hasUnreadNotifications ? "true" : "false"));
+        } catch (IOException e) {
+            log.warn("읽지 않은 알림 상태 전송 실패: {}", e.getMessage());
         }
     }
 
@@ -123,7 +155,10 @@ public class NotificationServiceImpl implements NotificationService {
      * 특정 사용자에게 실시간 알림 전송
      */
     @Override
+    @Async("asyncExecutor") // 스레드 풀 사용
     public void sendNotification(NotificationRequestDto requestDto) {
+        log.info("[알림 전송 시작] 메시지: {} | 스레드: {}", requestDto.message(), Thread.currentThread().getName());
+
         // 1. Notification 테이블에 insert
         NotificationResponseDto savedNotification = postNotification(requestDto);
         log.info("저장된 notification = {} {}", savedNotification.notifyTime(), savedNotification.message());
