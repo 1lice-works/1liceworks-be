@@ -617,7 +617,7 @@ public class DataLoader {
     // 2024년 12월부터 2025년 3월 사이의 무작위 값 설정
     private LocalDateTime getRandomDateTime() {
         long startEpoch = LocalDateTime.of(2024, 12, 1, 0, 0).toEpochSecond(java.time.ZoneOffset.UTC);
-        long endEpoch = LocalDateTime.of(2025, 3, 31, 23, 59).toEpochSecond(java.time.ZoneOffset.UTC);
+        long endEpoch = LocalDateTime.of(2025, 2, 28, 23, 59).toEpochSecond(java.time.ZoneOffset.UTC);
         long randomEpoch = ThreadLocalRandom.current().nextLong(startEpoch, endEpoch);
         return LocalDateTime.ofEpochSecond(randomEpoch, 0, java.time.ZoneOffset.UTC);
     }
