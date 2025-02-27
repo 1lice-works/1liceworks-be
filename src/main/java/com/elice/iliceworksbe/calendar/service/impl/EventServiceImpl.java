@@ -4,6 +4,7 @@ import com.elice.iliceworksbe.auth.entity.User;
 import com.elice.iliceworksbe.auth.repository.UserRepository;
 import com.elice.iliceworksbe.calendar.dto.request.PostMyEventRequestDto;
 import com.elice.iliceworksbe.calendar.dto.request.PostTeamEventRequestDto;
+import com.elice.iliceworksbe.calendar.dto.response.EventJsonResponseDto;
 import com.elice.iliceworksbe.calendar.entity.Calendar;
 import com.elice.iliceworksbe.calendar.entity.Event;
 import com.elice.iliceworksbe.calendar.entity.EventParticipant;
@@ -22,12 +23,17 @@ import com.elice.iliceworksbe.notification.utils.NotificationMessages;
 import com.elice.iliceworksbe.team.entity.Team;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
@@ -127,5 +133,22 @@ public class EventServiceImpl implements EventService {
                 .event(myEvent)
                 .build();
         eventParticipantRepository.save(eventParticipant);
+    }
+
+    @Override
+    public List<EventJsonResponseDto> getEventsByDateAndParticipants(Long teamCalendarId, LocalDate date, List<Long> userIds) {
+        LocalDateTime startDateTime = date.atStartOfDay();
+        LocalDateTime endDateTime = date.atTime(23, 59, 59);
+
+        List<Event> events = eventRepository.findEventsByDateAndParticipants(
+                teamCalendarId, userIds, startDateTime, endDateTime
+        );
+
+        if (events.isEmpty()) {
+            log.info("events size: {}", events.size());
+        }
+
+        List<EventJsonResponseDto> eventJsonResponseDtos = events.stream().map(EventJsonResponseDto::from).collect(Collectors.toList());
+        return eventJsonResponseDtos;
     }
 }
