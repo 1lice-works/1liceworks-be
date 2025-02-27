@@ -68,6 +68,7 @@ public enum ErrorCode {
     FAILED_TO_CONNECT_SERVER(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버와의 연결에 실패하였습니다."),
     FAILED_TO_ENCRYPT_PASSWORD(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "비밀번호 암호화에 실패하였습니다."),
     FAILED_TO_DECRYPT_PASSWORD(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "비밀번호 복호화에 실패하였습니다."),
+    FAILED_TO_SEND_WEBHOOK(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "웹훅 전송 중 오류가 발생했습니다."),
     UNEXPECTED_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR.value(), "예상치 못한 에러가 발생했습니다."),
 
     /**

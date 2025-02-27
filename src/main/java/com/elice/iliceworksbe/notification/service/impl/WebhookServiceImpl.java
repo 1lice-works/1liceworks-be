@@ -23,6 +23,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.http.*;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,7 +82,8 @@ public class WebhookServiceImpl implements WebhookService {
      * @param webhookMessageDto
      * @return
      */
-    @Transactional
+    @Retryable(recover = "recover",
+                 backoff = @Backoff(delay = 2000))  //3번 재시도
     @Override
     public boolean sendWebhookMessage(Long calendarId, WebhookMessageDto webhookMessageDto) {
 
@@ -88,6 +93,7 @@ public class WebhookServiceImpl implements WebhookService {
 
         String payloadUrl = webhook.getPayloadUrl();
         String contentType = webhook.getContentType().getValue();
+        log.info("시도 횟수 : {}", RetrySynchronizationManager.getContext().getRetryCount() + 1);
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) { // HttpClient 생성
             HttpPost httpPost = new HttpPost(payloadUrl);
@@ -107,14 +113,23 @@ public class WebhookServiceImpl implements WebhookService {
                 if (statusCode != HttpStatus.NO_CONTENT.value()) {
                     log.error("메시지 전송 실패, 응답 코드: {}", statusCode);
                     log.error("응답 내용: {}", EntityUtils.toString(response.getEntity()));
-                    return false;
+                    throw new BaseException(ErrorCode.FAILED_TO_SEND_WEBHOOK);
                 }
             }
         } catch (Exception e) {
             log.error("에러 발생: {}", e.getMessage());
-            return false;
+            throw new BaseException(ErrorCode.FAILED_TO_SEND_WEBHOOK);
         }
         return true;
+    }
+
+    /**
+     * 재시도 실패 후 실행되는 메서드
+     */
+    @Recover
+    public boolean recover(BaseException e, Long calendarId, WebhookMessageDto webhookMessageDto) {
+        log.error("재시도 실패 후 복구 실행: {}", e.getMessage());
+        return false;  // 최종 실패 처리
     }
 
     @Override
