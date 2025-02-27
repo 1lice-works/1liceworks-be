@@ -1,9 +1,10 @@
 package com.elice.iliceworksbe.ai.service.impl;
 
 import com.elice.iliceworksbe.ai.config.property.AIProperty;
-import com.elice.iliceworksbe.ai.dto.GenerateScheduleRequestDto;
-import com.elice.iliceworksbe.ai.dto.GenerateScheduleResponseDto;
+import com.elice.iliceworksbe.ai.dto.*;
 import com.elice.iliceworksbe.ai.service.AIService;
+import com.elice.iliceworksbe.calendar.dto.response.EventJsonResponseDto;
+import com.elice.iliceworksbe.calendar.service.EventService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
@@ -15,14 +16,15 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AIServiceImpl implements AIService {
+
+    private final EventService eventService;
 
     private final AIProperty aiProperty;
     private final HttpClient httpClient = HttpClient.newHttpClient();
@@ -53,13 +55,16 @@ public class AIServiceImpl implements AIService {
         }
     }
 
-    //개발 미완료
     @Override
-    public String findFreeTime(Map<String, Object> calendarData) {
+    public FindFreeTimeResponseDto findFreeTime(Long teamCalendarId, FindFreeTimeRequestDto requestDto) {
         try {
             String url = aiProperty.getFlaskUrl() + "/find_free_time";
+            List<EventJsonResponseDto> events = eventService.getEventsByDateAndParticipants(teamCalendarId, requestDto.getDate(), requestDto.getUserIds());
 
-            String requestBodyJson = objectMapper.writeValueAsString(calendarData);
+            FindFreeTimeInputDto inputDto = FindFreeTimeInputDto.of(requestDto.getDuration(), requestDto.getDate(), events);
+
+            String requestBodyJson = objectMapper.writeValueAsString(inputDto);
+            log.info("duration: {}, date: {}, events: {}", requestDto.getDuration(), requestDto.getDate(), events);
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
@@ -68,12 +73,11 @@ public class AIServiceImpl implements AIService {
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
             log.info("findFreeTime Response: {}", response.body());
-            return response.body();
+            return objectMapper.readValue(response.body(), FindFreeTimeResponseDto.class);
         } catch (Exception e) {
             log.error("Error in findFreeTime: ", e);
-            return "{}";
+            return new FindFreeTimeResponseDto();
         }
     }
 }

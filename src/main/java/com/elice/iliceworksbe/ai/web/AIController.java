@@ -1,24 +1,19 @@
 package com.elice.iliceworksbe.ai.web;
 
+import com.elice.iliceworksbe.ai.dto.FindFreeTimeRequestDto;
+import com.elice.iliceworksbe.ai.dto.FindFreeTimeResponseDto;
 import com.elice.iliceworksbe.ai.dto.GenerateScheduleRequestDto;
 import com.elice.iliceworksbe.ai.dto.GenerateScheduleResponseDto;
 import com.elice.iliceworksbe.ai.service.AIService;
 import com.elice.iliceworksbe.auth.model.UserDetailsImpl;
-import com.elice.iliceworksbe.calendar.dto.request.PostMyEventRequestDto;
 import com.elice.iliceworksbe.calendar.service.EventService;
 import com.elice.iliceworksbe.common.exception.BaseResponse;
-import com.elice.iliceworksbe.common.exception.ErrorCode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,11 +24,7 @@ public class AIController {
     private final AIService aiService;
     private final EventService eventService;
 
-    /**
-     * TODO
-     * 검증 로직 보완
-     */
-    @Operation(summary = "AI로 생성된 캘린더 일정 조회", description = "AI가 생성한 내 일정을 조회합니다.")
+    @Operation(summary = "AI 일정 생성 기능", description = "프롬프트에 값을 입력하면 AI가 캘린더 일정 생성 JSON 데이터를 반환합니다.")
     @PostMapping("/generate_schedule")
     public BaseResponse<GenerateScheduleResponseDto> generateSchedule(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -42,30 +33,13 @@ public class AIController {
         return new BaseResponse<>(result);
     }
 
-    @Operation(summary = "AI로 캘린더 일정 생성", description = "AI가 해당하는 캘린더ID에서 내 일정을 생성합니다.")
-    @PostMapping("/generate_schedule/ok")
-    public BaseResponse<GenerateScheduleResponseDto> generateScheduleOk(
+    @Operation(summary = "AI 빈 시간 찾기 기능", description = "AI가 일정 중 빈 시간을 찾아서 JSON 데이터로 반환합니다.")
+    @PostMapping("find_free_time")
+    public BaseResponse<FindFreeTimeResponseDto> findFreeTime(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestBody GenerateScheduleRequestDto requestDto) {
-        GenerateScheduleResponseDto result = aiService.generateSchedule(requestDto);
-        eventService.postMyEvent(userDetails.getUserId(), PostMyEventRequestDto.from(result));
+            @RequestParam Long teamCalendarId,
+            @RequestBody FindFreeTimeRequestDto requestDto) {
+        FindFreeTimeResponseDto result = aiService.findFreeTime(teamCalendarId, requestDto);
         return new BaseResponse<>(result);
-    }
-
-    /**
-     * TODO
-     * 아직 개발 완료 안했습니다!
-     */
-    @PostMapping("/find_free_time")
-    public BaseResponse<Map<String, Object>> findFreeTime(@RequestBody Map<String, Object> request) {
-        String resultJson = aiService.findFreeTime(request);
-
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> result = objectMapper.readValue(resultJson, Map.class);
-            return new BaseResponse<>(result);
-        } catch (Exception e) {
-            return new BaseResponse<>(ErrorCode.FAILED_TO_JSON_PARSING);
-        }
     }
 }
