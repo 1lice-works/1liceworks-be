@@ -4,6 +4,7 @@ import com.elice.iliceworksbe.auth.dto.request.PatchProfileRequestDto;
 import com.elice.iliceworksbe.common.constant.Role;
 import com.elice.iliceworksbe.common.constant.Status;
 import com.elice.iliceworksbe.common.entity.BaseEntity;
+import com.elice.iliceworksbe.team.entity.Employee;
 import com.elice.iliceworksbe.team.entity.Team;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -58,6 +59,9 @@ public class User extends BaseEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Employee employee;
+
     public void patchMyProfile(PatchProfileRequestDto patchProfileRequestDto, String updatedProfileImageUrl) {
         this.username = patchProfileRequestDto.username();
         this.phone = patchProfileRequestDto.phone();
@@ -79,18 +83,22 @@ public class User extends BaseEntity {
     public void setUserStatus(Status status) {
         this.status = status;
     }
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
 
     public ArchivingUser toArchivingUser() {
         return ArchivingUser.builder()
-                .username(this.username)
-                .password(this.password)
-                .accountId(this.accountId)
-                .privateEmail(this.privateEmail)
-                .role(this.role)
-                .profileImage(this.profileImage)
-                .phone(this.phone)
-                .isTeamCreated(this.isTeamCreated)
-                .team(this.team)
+                .username(this.getUsername())
+                .password(this.getPassword())
+                .accountId(this.getAccountId())
+                .privateEmail(this.getPrivateEmail())
+                .role(this.getRole())
+                .profileImage(this.getProfileImage())
+                .phone(this.getPhone())
+                .status(this.getStatus())
+                .isTeamCreated(this.getIsTeamCreated())
+                .team(this.getTeam())
                 .build();
     }
 }

@@ -166,6 +166,8 @@ public class AuthServiceImpl implements AuthService {
                 .hireDate(LocalDateTime.now())
                 .build();
 
+        signUpUser.setEmployee(signUpEmployee);
+
         // 6. 해당 팀의 캘린더 생성
         Calendar teamCalendar = Calendar.builder()
                 .name(signUpRequestDto.teamInfo().teamName() + "팀 캘린더")

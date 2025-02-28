@@ -221,9 +221,15 @@ public class DataLoader {
         userRepository.save(kyungjunUser);
 
         // employee 저장
+        taeseungUser.setEmployee(taeseungEmployee);
+        soogyeongUser.setEmployee(soogyeongEmployee);
+        kwanghoUser.setEmployee(kwanghoEmployee);
+        hyerimUser.setEmployee(hyerimEmployee);
+        kyungjunUser.setEmployee(kyungjunEmployee);
+
         employeeRepository.save(taeseungEmployee);
-        employeeRepository.save(kwanghoEmployee);
         employeeRepository.save(soogyeongEmployee);
+        employeeRepository.save(kwanghoEmployee);
         employeeRepository.save(hyerimEmployee);
         employeeRepository.save(kyungjunEmployee);
 

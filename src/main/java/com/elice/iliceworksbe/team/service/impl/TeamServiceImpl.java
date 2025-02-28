@@ -57,6 +57,7 @@ public class TeamServiceImpl implements TeamService {
         JobTitle jobTitle = findJobTitleByName(teamMemberRequestDto.jobTitle());
 
         Employee employee = addNewEmployee(member, userType, position, jobTitle);
+        member.setEmployee(employee);
         employeeRepository.save(employee);
 
         Calendar memberCalendar = addNewCalendar(teamMemberRequestDto, member);

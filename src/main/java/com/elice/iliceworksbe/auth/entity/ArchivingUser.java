@@ -1,6 +1,7 @@
 package com.elice.iliceworksbe.auth.entity;
 
 import com.elice.iliceworksbe.common.constant.Role;
+import com.elice.iliceworksbe.common.constant.Status;
 import com.elice.iliceworksbe.common.entity.BaseEntity;
 import com.elice.iliceworksbe.team.entity.Team;
 import jakarta.persistence.*;
@@ -33,7 +34,7 @@ public class ArchivingUser extends BaseEntity{
     @Column(name = "account_id", nullable = false)
     private String accountId;
 
-    @Column(name = "private_email", nullable = false)
+    @Column(name = "private_email")
     private String privateEmail;
 
     @Column(name = "role", nullable = false)
@@ -44,6 +45,10 @@ public class ArchivingUser extends BaseEntity{
 
     @Column(name = "phone")
     private String phone;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @Column(name = "is_team_created")
     private Boolean isTeamCreated;
