@@ -22,7 +22,6 @@ import com.elice.iliceworksbe.team.entity.Team;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -95,7 +94,6 @@ class WebhookServiceTest {
 
     WebhookRequestDto requestDto = new WebhookRequestDto(calendarId, "https://discord.com/api/webhooks/1342348107215798306/bYtBuXjzlkFdsj2saJ03Mo5GvZUCPaGRFB7EsK7no01urQ61OnPMqvZnY2XJkewuRTcn", ContentType.APPLICATION_JSON);
 
-
     @Test
     @DisplayName("웹훅 저장 성공")
     void testPostWebhook_Success() {
@@ -119,7 +117,7 @@ class WebhookServiceTest {
 
     @Test
     @DisplayName("웹훅 저장 실패 - 1. 존재하지 않는 캘린더")
-    void testPostWebhook_CalendarNotFound() {
+    void testPostWebhook_Fail_CalendarNotFound() {
 
         // given
         given(calendarRepository.findById(calendarId)).willReturn(Optional.empty());
@@ -134,7 +132,7 @@ class WebhookServiceTest {
 
     @Test
     @DisplayName("웹훅 저장 실패 - 2. 사용자의 팀이 존재하지 않을 때")
-    void testPostWebhook_TeamNotFound() {
+    void testPostWebhook_Fail_TeamNotFound() {
         // given
         given(calendarRepository.findById(calendarId)).willReturn(Optional.of(calendarBE));
         given(userRepository.findTeamIdByUserId(userId)).willReturn(Optional.empty());
@@ -149,7 +147,7 @@ class WebhookServiceTest {
 
     @Test
     @DisplayName("웹훅 저장 실패 - 3. member가 웹훅을 등록하려 할 때")
-    void testPostWebhook_InvalidAuthorization() {
+    void testPostWebhook_Fail_InvalidAuthorization() {
         // given
         User memberUser = User.builder()
                 .id(2L)
@@ -217,7 +215,7 @@ class WebhookServiceTest {
 
     @Test
     @DisplayName("웹훅 조회 실패 - 저장된 웹훅이 없는 경우")
-    void getWebhook_NotFound() {
+    void getWebhook_Fail_NotFound() {
         // given
         given(webhookRepository.findById(webhookId)).willReturn(Optional.empty());
 
@@ -256,7 +254,7 @@ class WebhookServiceTest {
 
     @Test
     @DisplayName("웹훅 수정 실패 - 저장된 웹훅이 없을 경우")
-    void patchWebhook_NotFound() {
+    void patchWebhook_Fail_NotFound() {
         // given
         WebhookUpdateDto webhookUpdateDto = new WebhookUpdateDto("https://new-url.com", ContentType.APPLICATION_JSON);
         given(webhookRepository.findById(webhookId)).willReturn(Optional.empty());
@@ -269,15 +267,40 @@ class WebhookServiceTest {
         // 예외 코드가 맞는지 확인
         assertEquals(ErrorCode.NOT_FOUND_WEBHOOK, thrown.getStatus());
     }
+
+    @Test
+    @DisplayName("웹훅 삭제 성공")
+    void deleteWebhook_Success() {
+        // given
+        given(webhookRepository.findById(webhookId)).willReturn(Optional.of(iliceTeamBE_webhook));
+
+        // when
+        webhookService.deleteWebhook(webhookId); // 삭제 메서드 호출
+
+        // then
+        verify(webhookRepository, times(1)).deleteById(webhookId);
+
+        // 삭제 후 해당 webhookId로 조회 시, 예외가 발생하는지 확인
+        given(webhookRepository.findById(webhookId)).willReturn(Optional.empty()); // 삭제 후 조회 결과는 empty
+        assertThrows(BaseException.class, () -> webhookService.deleteWebhook(webhookId)); // 예외가 발생해야 함
+    }
+
+    @Test
+    @DisplayName("웹훅 삭제 실패 - 웹훅이 존재하지 않음")
+    void deleteWebhook_Fail_NotFound() {
+        // given
+        given(webhookRepository.findById(webhookId)).willReturn(Optional.empty());
+
+        // when & then
+        // 삭제 메서드를 호출할 때 예외가 발생
+        assertThrows(BaseException.class, () -> webhookService.deleteWebhook(webhookId));
+
+        // deleteById는 호출되지 않아야 한다
+        verify(webhookRepository, times(0)).deleteById(webhookId);
+    }
+
     @Test
     void sendWebhookMessage() {
     }
 
-    @Test
-    void patchWebhook() {
-    }
-
-    @Test
-    void deleteWebhook() {
-    }
 }
