@@ -1,6 +1,7 @@
 package com.elice.iliceworksbe.auth.service;
 
 import com.elice.iliceworksbe.auth.dto.request.*;
+import com.elice.iliceworksbe.auth.dto.response.GetMySemiProfileResponseDto;
 import com.elice.iliceworksbe.auth.dto.response.GetProfileResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,4 +34,6 @@ public interface AuthService extends UserDetailsService {
     void changePasswordByEmail(ChangePasswordRequestDto changePasswordRequestDto);
 
     void verifyEmailPassword(VerifyEmailRequestDto verifyEmailRequestDto);
+
+    GetMySemiProfileResponseDto getMyMinimalProfile(Long userId);
 }
