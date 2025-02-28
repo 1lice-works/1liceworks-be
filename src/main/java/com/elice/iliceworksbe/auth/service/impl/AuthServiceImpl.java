@@ -1,6 +1,7 @@
 package com.elice.iliceworksbe.auth.service.impl;
 
 import com.elice.iliceworksbe.auth.dto.request.*;
+import com.elice.iliceworksbe.auth.dto.response.GetMySemiProfileResponseDto;
 import com.elice.iliceworksbe.auth.dto.response.GetProfileResponseDto;
 import com.elice.iliceworksbe.auth.entity.User;
 import com.elice.iliceworksbe.auth.model.UserDetailsImpl;
@@ -86,6 +87,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void verifyEmailPassword(VerifyEmailRequestDto verifyEmailRequestDto) {
         sendVerificationCodeByEmail(verifyEmailRequestDto);
+    }
+
+    @Override
+    public GetMySemiProfileResponseDto getMyMinimalProfile(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
+        return GetMySemiProfileResponseDto.from(user);
     }
 
     private void sendVerificationCodeByEmail(VerifyEmailRequestDto verifyEmailRequestDto) {
