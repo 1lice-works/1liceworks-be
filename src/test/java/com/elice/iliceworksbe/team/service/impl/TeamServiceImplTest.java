@@ -513,6 +513,37 @@ class TeamServiceImplTest {
     }
 
     @Test
+    void 팀_정보_수정_실패_팀을_못찾는_경우() {
+        // given
+        Long teamFeId = teamFe.getId();
+        Long teamBeLeaderId = teamBeLeader.getId();
+        TeamInfoUpdateDto updateDto = new TeamInfoUpdateDto("이리스 BE팀");
+
+        given(teamRepository.findById(teamFeId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> teamService.patchTeamInfo(teamBeLeaderId, teamFeId, updateDto))
+                .isInstanceOf(BaseException.class)
+                .hasMessage(ErrorCode.NOT_FOUND_TEAM.getMessage());
+    }
+
+    @Test
+    void 팀_정보_수정_실패_리더를_못찾는_경우() {
+        // given
+        Long teamFeId = teamFe.getId();
+        Long teamBeLeaderId = teamBeLeader.getId();
+        TeamInfoUpdateDto updateDto = new TeamInfoUpdateDto("이리스 BE팀");
+
+        given(teamRepository.findById(teamFeId)).willReturn(Optional.of(teamFe));
+        given(userRepository.findById(teamBeLeaderId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> teamService.patchTeamInfo(teamBeLeaderId, teamFeId, updateDto))
+                .isInstanceOf(BaseException.class)
+                .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage());
+    }
+
+    @Test
     void 팀_정보_수정_실패_다른_팀_정보_수정() {
         // given
         Long teamFeId = teamFe.getId();
