@@ -73,6 +73,7 @@ public class EventReminderServiceImpl implements EventReminderService {
 
     /**
      * EventReminder 조회
+     *
      * @param eventId
      * @return
      */
@@ -86,6 +87,7 @@ public class EventReminderServiceImpl implements EventReminderService {
 
     /**
      * 일정에 있는 EventReminder 모두 삭제
+     *
      * @param eventId
      */
     @Override
@@ -135,14 +137,15 @@ public class EventReminderServiceImpl implements EventReminderService {
     public void processEventReminder(EventReminder eventReminder) {
         Long eventId = eventReminder.getEvent().getId();
         log.info("eventId", eventId);
-        String message = eventReminder.getEvent().getDescription();
+        String message = "EventReminder : " + eventReminder.getEvent().getTitle();
 
         List<EventParticipant> participants = eventParticipantRepository.findByEventId(eventId);
         log.info("이벤트 '{}' 에 대한 참가자 수: {}", message, participants.size());
 
         participants.forEach(participant -> {
             try {
-                NotificationRequestDto requestDto = new NotificationRequestDto(participant.getId(), message);
+                log.info("알림 전송 - 사용자: {}", participant.getUser().getId());
+                NotificationRequestDto requestDto = new NotificationRequestDto(participant.getUser().getId(), message);
                 notificationService.sendNotification(requestDto);
             } catch (Exception e) {
                 log.error("알림 전송 실패 - 사용자: {}, 오류: {}", participant.getId(), e.getMessage(), e);
