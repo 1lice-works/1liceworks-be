@@ -7,6 +7,7 @@ import com.elice.iliceworksbe.team.dto.userType.UserTypeResponseDto;
 import com.elice.iliceworksbe.team.dto.userType.UserTypeUpdateDto;
 import com.elice.iliceworksbe.team.entity.UserType;
 import com.elice.iliceworksbe.team.repository.UserTypeRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,8 +29,9 @@ class UserTypeServiceImplTest {
     @InjectMocks
     private UserTypeServiceImpl userTypeService;
 
+    @DisplayName("사용자 유형 저장 성공")
     @Test
-    void UserType_저장_성공() {
+    void givenUserType_whenPostUserType_thenSave() {
         // given
         UserTypeRequestDto requestDto = new UserTypeRequestDto("계약직");
         UserType savedUserType = UserType.from(requestDto);
@@ -45,8 +47,9 @@ class UserTypeServiceImplTest {
         verify(userTypeRepository).save(any(UserType.class));
     }
 
+    @DisplayName("사용자 유형 저장 실패 - 중복된 사용자 유형명")
     @Test
-    void UserType_저장_실패_중복된_이름() {
+    void givenDuplicatedUserType_whenPostUserType_thenThrow_DUPLICATED_USER_TYPE_NAME() {
         // given
         UserTypeRequestDto requestDto = new UserTypeRequestDto("계약직");
 
@@ -60,8 +63,9 @@ class UserTypeServiceImplTest {
         verify(userTypeRepository, never()).save(any(UserType.class));
     }
 
+    @DisplayName("사용자 유형 조회 성공")
     @Test
-    void UserType_조회_성공() {
+    void givenUserType_whenGetUserType_thenReturnUserType() {
         // given
         Long userTypeId = 1L;
         UserType userType = new UserType(userTypeId, "계약직");
@@ -75,8 +79,9 @@ class UserTypeServiceImplTest {
         assertThat(foundUserType.name()).isEqualTo("계약직");
     }
 
+    @DisplayName("사용자 유형 조회 실패 - 존재하지 않는 사용자 유형")
     @Test
-    void UserType_조회_실패_존재하지않음() {
+    void givenNonExistUserType_whenGetUserType_thenThrow_NOT_FOUND_USER_TYPE() {
         // given
         Long userTypeId = 1L;
         given(userTypeRepository.findById(userTypeId)).willReturn(Optional.empty());
@@ -87,8 +92,9 @@ class UserTypeServiceImplTest {
                 .hasMessage(ErrorCode.NOT_FOUND_USER_TYPE.getMessage());
     }
 
+    @DisplayName("사용자 유형 전체 조회 성공")
     @Test
-    void UserType_전체조회() {
+    void givenUserTypes_whenGetAllUserTypes_thenReturnUserTypes() {
         // given
         List<UserType> userTypes = List.of(
                 new UserType(1L, "계약직"),
@@ -106,8 +112,9 @@ class UserTypeServiceImplTest {
         assertThat(allUserTypes.get(1).name()).isEqualTo("정규직");
     }
 
+    @DisplayName("사용자 유형 수정 성공")
     @Test
-    void UserType_수정_성공() {
+    void givenUserType_whenPatchUserType_thenReturnUpdatedUserType() {
         // given
         Long userTypeId = 1L;
         UserType userType = new UserType(userTypeId, "계약직");
@@ -124,8 +131,9 @@ class UserTypeServiceImplTest {
         assertThat(updatedUserType.name()).isEqualTo("정규직");
     }
 
+    @DisplayName("사용자 유형 수정 실패 - 중복된 사용자 유형명")
     @Test
-    void UserType_수정_실패_중복된_이름() {
+    void givenDuplicatedUserType_whenPatchUserType_thenThrow_DUPLICATED_USER_TYPE_NAME() {
         // given
         Long userTypeId = 1L;
         UserType userType = new UserType(userTypeId, "계약직");
@@ -140,8 +148,9 @@ class UserTypeServiceImplTest {
                 .hasMessage(ErrorCode.DUPLICATED_USER_TYPE_NAME.getMessage());
     }
 
+    @DisplayName("사용자 유형 삭제 성공")
     @Test
-    void UserType_삭제_성공() {
+    void givenUserType_whenDeleteUserType_thenDeleteUserType() {
         // given
         Long userTypeId = 1L;
         UserType userType = new UserType(userTypeId, "계약직");
@@ -155,8 +164,9 @@ class UserTypeServiceImplTest {
         verify(userTypeRepository).deleteById(userTypeId);
     }
 
+    @DisplayName("사용자 유형 삭제 실패 - 존재하지 않는 사용자 유형")
     @Test
-    void UserType_삭제_실패_존재하지않음() {
+    void givenUserType_whenDeleteUserType_thenThrow_NOT_FOUND_USER_TYPE() {
         // given
         Long userTypeId = 1L;
         given(userTypeRepository.findById(userTypeId)).willReturn(Optional.empty());

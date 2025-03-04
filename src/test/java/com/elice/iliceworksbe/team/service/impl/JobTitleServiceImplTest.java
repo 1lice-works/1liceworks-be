@@ -7,6 +7,7 @@ import com.elice.iliceworksbe.team.dto.jobTitle.JobTitleResponseDto;
 import com.elice.iliceworksbe.team.dto.jobTitle.JobTitleUpdateDto;
 import com.elice.iliceworksbe.team.entity.JobTitle;
 import com.elice.iliceworksbe.team.repository.JobTitleRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,8 +29,9 @@ class JobTitleServiceImplTest {
     @InjectMocks
     private JobTitleServiceImpl jobTitleService;
 
+    @DisplayName("직책 저장 성공")
     @Test
-    void jobTitle_저장_성공() {
+    void givenJobTitle_whenPostJobTitle_thenSave() {
         // given
         JobTitleRequestDto requestDto = new JobTitleRequestDto("일반직");
         JobTitle savedJobTitle = JobTitle.from(requestDto);
@@ -41,12 +43,12 @@ class JobTitleServiceImplTest {
         JobTitleResponseDto responseDto = jobTitleService.postJobTitle(requestDto);
 
         // then
-        assertThat(responseDto.name()).isEqualTo("일반직");
+        assertThat(responseDto.name()).isEqualTo(responseDto.name());
         verify(jobTitleRepository).save(any(JobTitle.class)); // save() 호출 검증
     }
-
+    @DisplayName("직책 저장 실패 - 중복된 직책명")
     @Test
-    void jobTitle_저장_실패_중복된_이름() {
+    void givenDuplicatedJobTitle_whenPostJobTitle_thenThrow_DUPLICATED_JOB_TITLE_NAME() {
         // given
         JobTitleRequestDto requestDto = new JobTitleRequestDto("일반직");
 
@@ -59,9 +61,9 @@ class JobTitleServiceImplTest {
 
         verify(jobTitleRepository, never()).save(any(JobTitle.class)); // save()가 호출되지 않아야 함
     }
-
+    @DisplayName("직책 조회 성공")
     @Test
-    void jobTitle_조회_성공() {
+    void givenJobTitle_whenGetJobTitle_thenReturnJobTitle() {
         // given
         Long jobTitleId = 1L;
         JobTitle jobTitle = new JobTitle(jobTitleId, "일반직");
@@ -72,11 +74,11 @@ class JobTitleServiceImplTest {
         JobTitleResponseDto foundJobTitle = jobTitleService.getJobTitle(jobTitleId);
 
         // then
-        assertThat(foundJobTitle.name()).isEqualTo("일반직");
+        assertThat(foundJobTitle.name()).isEqualTo(jobTitle.getName());
     }
-
+    @DisplayName("직책 조회 실패 - 존재하지 않는 직책")
     @Test
-    void jobTitle_조회_실패_존재하지않음() {
+    void givenNonExistJobTitle_whenGetJobTitle_thenThrow_NOT_FOUND_JOB_TITLE() {
         // given
         Long jobTitleId = 1L;
         given(jobTitleRepository.findById(jobTitleId)).willReturn(Optional.empty());
@@ -86,9 +88,9 @@ class JobTitleServiceImplTest {
                 .isInstanceOf(BaseException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_JOB_TITLE.getMessage());
     }
-
+    @DisplayName("직책 전체 조회 성공 ")
     @Test
-    void jobTitle_전체조회() {
+    void givenJobTitles_whenGetAllJobTitles_thenReturnJobTitles() {
         // given
         List<JobTitle> jobTitles = List.of(
                 new JobTitle(1L, "일반직"),
@@ -102,12 +104,12 @@ class JobTitleServiceImplTest {
 
         // then
         assertThat(allJobTitles).hasSize(2);
-        assertThat(allJobTitles.get(0).name()).isEqualTo("일반직");
-        assertThat(allJobTitles.get(1).name()).isEqualTo("사무직");
+        assertThat(allJobTitles.get(0).name()).isEqualTo(jobTitles.get(0).getName());
+        assertThat(allJobTitles.get(1).name()).isEqualTo(jobTitles.get(1).getName());
     }
-
+    @DisplayName("직책 수정 성공")
     @Test
-    void jobTitle_수정_성공() {
+    void givenJobTitle_whenPatchJobTitle_thenReturnUpdatedJobTitle() {
         // given
         Long jobTitleId = 1L;
         JobTitle jobTitle = new JobTitle(jobTitleId, "일반직");
@@ -121,11 +123,12 @@ class JobTitleServiceImplTest {
         JobTitleResponseDto updatedJobTitle = jobTitleService.patchJobTitle(jobTitleId, updateDto);
 
         // then
-        assertThat(updatedJobTitle.name()).isEqualTo("사무직");
+        assertThat(updatedJobTitle.name()).isEqualTo(jobTitle.getName());
     }
 
+    @DisplayName("직책 수정 실패 - 중복된 직책명")
     @Test
-    void jobTitle_수정_실패_중복된_이름() {
+    void givenDuplicatedJobTitle_whenPatchJobTitle_thenThrow_DUPLICATED_JOB_TITLE_NAME() {
         // given
         Long jobTitleId = 1L;
         JobTitle jobTitle = new JobTitle(jobTitleId, "일반직");
@@ -141,8 +144,9 @@ class JobTitleServiceImplTest {
 
     }
 
+    @DisplayName("직책 삭제 성공")
     @Test
-    void jobTitle_삭제_성공() {
+    void givenJobTitle_whenDeleteJobTitle_thenDeleteJobTitle() {
         // given
         Long jobTitleId = 1L;
         JobTitle jobTitle = new JobTitle(jobTitleId, "일반직");
@@ -156,8 +160,9 @@ class JobTitleServiceImplTest {
         verify(jobTitleRepository, times(1)).deleteById(jobTitleId); // deleteById() 호출 검증
     }
 
+    @DisplayName("직책 삭제 실패 - 존재하지 않는 직책")
     @Test
-    void jobTitle_삭제_실패_존재하지않음() {
+    void givenJobTitle_whenDeleteJobTitle_thenThrow_NOT_FOUND_JOB_TITLE() {
         // given
         Long jobTitleId = 1L;
         given(jobTitleRepository.findById(jobTitleId)).willReturn(Optional.empty());

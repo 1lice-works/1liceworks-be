@@ -7,6 +7,7 @@ import com.elice.iliceworksbe.team.dto.position.PositionResponseDto;
 import com.elice.iliceworksbe.team.dto.position.PositionUpdateDto;
 import com.elice.iliceworksbe.team.entity.Position;
 import com.elice.iliceworksbe.team.repository.PositionRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,8 +29,9 @@ class PositionServiceImplTest {
     @InjectMocks
     private PositionServiceImpl positionService;
 
+    @DisplayName("직급 저장 성공")
     @Test
-    void Position_저장_성공() {
+    void givenPosition_whenPostPosition_thenSave() {
         // given
         PositionRequestDto requestDto = new PositionRequestDto("팀장");
         Position savedPosition = Position.from(requestDto);
@@ -45,8 +47,9 @@ class PositionServiceImplTest {
         verify(positionRepository).save(any(Position.class));
     }
 
+    @DisplayName("직급 저장 실패 - 중복된 직급")
     @Test
-    void Position_저장_실패_중복된_이름() {
+    void givenDuplicatedPosition_whenPostPosition_thenThrow_DUPLICATED_POSITION_NAME() {
         // given
         PositionRequestDto requestDto = new PositionRequestDto("팀장");
 
@@ -60,8 +63,9 @@ class PositionServiceImplTest {
         verify(positionRepository, never()).save(any(Position.class));
     }
 
+    @DisplayName("직급 조회 성공")
     @Test
-    void Position_조회_성공() {
+    void givenPosition_whenGetPosition_thenReturnPosition() {
         // given
         Long positionId = 1L;
         Position position = new Position(positionId, "팀장");
@@ -75,8 +79,9 @@ class PositionServiceImplTest {
         assertThat(foundPosition.name()).isEqualTo("팀장");
     }
 
+    @DisplayName("직급 조회 실패 - 존재하지 않는 직급")
     @Test
-    void Position_조회_실패_존재하지않음() {
+    void givenNonExistPosition_whenGetPosition_thenThrow_NOT_FOUND_POSITION() {
         // given
         Long positionId = 1L;
         given(positionRepository.findById(positionId)).willReturn(Optional.empty());
@@ -87,8 +92,9 @@ class PositionServiceImplTest {
                 .hasMessage(ErrorCode.NOT_FOUND_POSITION.getMessage());
     }
 
+    @DisplayName("직급 전체 조회 성공")
     @Test
-    void Position_전체조회() {
+    void givenPositions_whenGetAllPositions_thenReturnPositions() {
         // given
         List<Position> positions = List.of(
                 new Position(1L, "팀장"),
@@ -106,8 +112,9 @@ class PositionServiceImplTest {
         assertThat(allPositions.get(1).name()).isEqualTo("사원");
     }
 
+    @DisplayName("직급 수정 성공")
     @Test
-    void Position_수정_성공() {
+    void givenPosition_whenPatchPosition_thenReturnUpdatedPosition() {
         // given
         Long positionId = 1L;
         Position position = new Position(positionId, "팀장");
@@ -124,8 +131,9 @@ class PositionServiceImplTest {
         assertThat(updatedPosition.name()).isEqualTo("부장");
     }
 
+    @DisplayName("직급 수정 실패 - 중복된 직급명")
     @Test
-    void Position_수정_실패_중복된_이름() {
+    void givenDuplicatedPosition_whenPatchPosition_thenThrow_DUPLICATED_POSITION_NAME() {
         // given
         Long positionId = 1L;
         Position position = new Position(positionId, "팀장");
@@ -140,8 +148,9 @@ class PositionServiceImplTest {
                 .hasMessage(ErrorCode.DUPLICATED_POSITION_NAME.getMessage());
     }
 
+    @DisplayName("직급 삭제 성공")
     @Test
-    void Position_삭제_성공() {
+    void givenPosition_whenDeletePosition_thenDeletePosition() {
         // given
         Long positionId = 1L;
         Position position = new Position(positionId, "팀장");
@@ -155,8 +164,9 @@ class PositionServiceImplTest {
         verify(positionRepository).deleteById(positionId);
     }
 
+    @DisplayName("직급 삭제 실패 - 존재하지 않는 직급")
     @Test
-    void Position_삭제_실패_존재하지않음() {
+    void givenPosition_whenDeletePosition_thenThrow_NOT_FOUND_POSITION() {
         // given
         Long positionId = 1L;
         given(positionRepository.findById(positionId)).willReturn(Optional.empty());

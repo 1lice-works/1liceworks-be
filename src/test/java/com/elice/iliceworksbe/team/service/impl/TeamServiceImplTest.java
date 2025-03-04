@@ -16,6 +16,7 @@ import com.elice.iliceworksbe.team.dto.team.*;
 import com.elice.iliceworksbe.team.entity.*;
 import com.elice.iliceworksbe.team.repository.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -175,8 +176,9 @@ class TeamServiceImplTest {
 
     }
 
+    @DisplayName("멤버 생성 성공")
     @Test
-    void 멤버_생성_성공() {
+    void givenUser_whenPostMember_thenSave() {
         // Given
         Long teamLeaderId = teamBeLeader.getId();
 
@@ -211,8 +213,9 @@ class TeamServiceImplTest {
         verify(calendarRepository, times(1)).save(any(Calendar.class));
     }
 
+    @DisplayName("멤버 생성 실패 - 중복된 유저 아이디")
     @Test
-    void 멤버_생성_실패_중복된_유저아이디() {
+    void givenUser_whenPostMember_thenThrow_DUPLICATED_ACCOUNT_ID() {
         // given
         Long teamLeaderId = teamBeLeader.getId();
 
@@ -236,8 +239,9 @@ class TeamServiceImplTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
+    @DisplayName("멤버 생성 실패 - 존재하지 않는 직책")
     @Test // jobTitle
-    void 멤버_생성_실패_존재하지않는_직책() {
+    void givenUser_whenPostMember_thenThrow_NOT_FOUND_JOB_TITLE() {
         // given
         Long teamLeaderId = teamBeLeader.getId();
 
@@ -267,8 +271,9 @@ class TeamServiceImplTest {
         verify(calendarRepository, never()).save(any(Calendar.class));
     }
 
+    @DisplayName("멤버 생성 실패 - 존재하지 않는 직급")
     @Test // position
-    void 멤버_생성_실패_존재하지않는_직급() {
+    void givenUser_whenPostMember_thenThrow_NOT_FOUND_POSITION() {
         // given
         Long teamLeaderId = teamBeLeader.getId();
 
@@ -299,8 +304,9 @@ class TeamServiceImplTest {
         verify(calendarRepository, never()).save(any(Calendar.class));
     }
 
+    @DisplayName("멤버 생성 실패 - 존재하지 않는 사용자 유형")
     @Test // userType
-    void 멤버_생성_실패_존재하지않는_유형() {
+    void givenUser_whenPostMember_thenThrow_NOT_FOUND_USER_TYPE() {
         // given
         Long teamLeaderId = teamBeLeader.getId();
 
@@ -330,8 +336,9 @@ class TeamServiceImplTest {
         verify(calendarRepository, never()).save(any(Calendar.class));
     }
 
+    @DisplayName("멤버 삭제 성공")
     @Test
-    void 멤버_삭제_성공() {
+    void givenLeaderIdAndMemberId_whenDeleteMember_thenDeleteMember() {
         // given
         Long teamLeaderId = teamBeLeader.getId();
         Long teamMemberId = teamBeMember.getId();
@@ -348,8 +355,9 @@ class TeamServiceImplTest {
 
     }
 
+    @DisplayName("멤버 삭제 실패 - 존재하지 않는 유저")
     @Test
-    void 멤버_삭제_실패_존재하지않는_유저() {
+    void givenLeaderIdAndMemberId_whenDeleteMember_thenThrowNOT_FOUND_USER() {
         // given
         Long teamLeaderId = teamBeLeader.getId();
         Long teamMemberId = 100L;
@@ -366,8 +374,9 @@ class TeamServiceImplTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
+    @DisplayName("멤버 삭제 실패 - 유저가 팀에 속하지 않음")
     @Test
-    void 멤버_삭제_실패_유저가_팀에_속하지_않음() {
+    void givenLeaderIdAndMemberId_whenDeleteMember_thenThrow_INVALID_AUTHORIZATION() {
         // given
         Long teamBeLeaderId = teamBeLeader.getId();
         Long teamFeMemberId = teamFeMember.getId();
@@ -384,8 +393,9 @@ class TeamServiceImplTest {
         verify(userRepository, never()).save(any(User.class));
     }
 
+    @DisplayName("멤버 상태 정지 성공")
     @Test
-    void 멤버_상태_정지_성공() {
+    void givenLeaderIdAndMemberId_whenPauseMember_thenPauseMemberStatus() {
         // given
         Long teamBeLeaderId = teamBeLeader.getId();
         Long teamBeMemberId = teamBeMember.getId();
@@ -400,8 +410,9 @@ class TeamServiceImplTest {
         assertThat(teamBeMember.getStatus()).isEqualTo(Status.INACTIVE);
     }
 
+    @DisplayName("멤버 상태 정지 실패 - 유저가 팀에 속하지 않음")
     @Test
-    void 멤버_상태_정지_실패_유저가_팀에_속하지_않음() {
+    void givenLeaderIdAndMemberId_whenPauseMember_thenThrow_INVALID_AUTHORIZATION() {
         // given
         Long teamBeLeaderId = teamBeLeader.getId();
         Long teamFeMemberId = teamFeMember.getId();
@@ -417,8 +428,9 @@ class TeamServiceImplTest {
         assertThat(teamBeMember.getStatus()).isEqualTo(Status.ACTIVE);
     }
 
+    @DisplayName("멤버 정보 수정 성공")
     @Test
-    void 멤버_정보_수정_성공() {
+    void givenLeaderIdAndMemberId_whenPatchMemberInfo_thenUpdateMemberInfo() {
         // given
         Long teamBeLeaderId = teamBeLeader.getId();
         Long teamBeMemberId = teamBeMember.getId();
@@ -447,8 +459,9 @@ class TeamServiceImplTest {
         assertThat(responseDto.employeeNumber()).isEqualTo(updateDto.employeeNumber());
     }
 
+    @DisplayName("멤버 정보 수정 실패 - 유저가 팀에 속하지 않음")
     @Test
-    void 멤버_정보_수정_실패_유저가_팀에_속하지_않음() {
+    void givenLeaderIdAndMemberId_whenPatchMemberInfo_thenThrow_INVALID_AUTHORIZATION() {
         // given
         Long teamBeLeaderId = teamBeLeader.getId();
         Long teamFeMemberId = teamFeMember.getId();
@@ -470,9 +483,9 @@ class TeamServiceImplTest {
                 .hasMessage(ErrorCode.INVALID_AUTHORIZATION.getMessage());
 
     }
-
+    @DisplayName("멤버 정보 수정 실패 - 유저로 직원을 찾을 수 없음")
     @Test
-    void 멤버_정보_수정_실패_유저로_직원을_찾을수없음() {
+    void givenLeaderIdAndMemberId_whenPatchMemberInfo_thenThrow_NOT_FOUND_EMPLOYEE() {
         // given
         Long teamBeLeaderId = teamBeLeader.getId();
         Long teamBeMemberId = teamBeMember.getId();
@@ -494,9 +507,9 @@ class TeamServiceImplTest {
                 .isInstanceOf(BaseException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_EMPLOYEE.getMessage());
     }
-
+    @DisplayName("팀 정보 수정 성공")
     @Test
-    void 팀_정보_수정_성공() {
+    void givenLeaderIdAndTeamId_whenPatchTeamInfo_thenUpdateTeam() {
         // given
         Long teamBeId = teamBe.getId();
         Long teamBeLeaderId = teamBeLeader.getId();
@@ -511,9 +524,9 @@ class TeamServiceImplTest {
         // then
         assertThat(teamBe.getTeamName()).isEqualTo(responseDto.teamName());
     }
-
+    @DisplayName("팀 정보 수정 실패 - 팀을 못찾는 경우")
     @Test
-    void 팀_정보_수정_실패_팀을_못찾는_경우() {
+    void givenLeaderIdAndTeamId_whenPatchTeamInfo_thenThrow_NOT_FOUND_TEAM() {
         // given
         Long teamFeId = teamFe.getId();
         Long teamBeLeaderId = teamBeLeader.getId();
@@ -526,9 +539,9 @@ class TeamServiceImplTest {
                 .isInstanceOf(BaseException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_TEAM.getMessage());
     }
-
+    @DisplayName("팀 정보 수정 실패 - 팀 리더를 못찾는 경우")
     @Test
-    void 팀_정보_수정_실패_리더를_못찾는_경우() {
+    void givenLeaderIdAndTeamId_whenPatchTeamInfo_thenThrow_NOT_FOUND_USER() {
         // given
         Long teamFeId = teamFe.getId();
         Long teamBeLeaderId = teamBeLeader.getId();
@@ -542,9 +555,9 @@ class TeamServiceImplTest {
                 .isInstanceOf(BaseException.class)
                 .hasMessage(ErrorCode.NOT_FOUND_USER.getMessage());
     }
-
+    @DisplayName("팀 정보 수정 실패 - 다른 팀 정보 수정")
     @Test
-    void 팀_정보_수정_실패_다른_팀_정보_수정() {
+    void givenLeaderIdAndTeamId_whenPatchTeamInfo_thenThrow_INVALID_AUTHORIZATION() {
         // given
         Long teamFeId = teamFe.getId();
         Long teamBeLeaderId = teamBeLeader.getId();
