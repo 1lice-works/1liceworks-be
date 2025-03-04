@@ -2,6 +2,7 @@ package com.elice.iliceworksbe.auth.web;
 
 import com.elice.iliceworksbe.auth.dto.request.*;
 import com.elice.iliceworksbe.auth.dto.response.AccessTokenResponseDto;
+import com.elice.iliceworksbe.auth.dto.response.GetMySemiProfileResponseDto;
 import com.elice.iliceworksbe.auth.dto.response.GetProfileResponseDto;
 import com.elice.iliceworksbe.auth.model.UserDetailsImpl;
 import com.elice.iliceworksbe.auth.service.AuthService;
@@ -149,5 +150,11 @@ public class AuthController {
     ) {
         authService.patchMemberProfile(userDetails.getUserId(), userId, patchProfileRequestDto);
         return new BaseResponse<>(ErrorCode.NO_CONTENT);
+    }
+
+    @Operation(summary = "최소 프로필 조회", description = "네비게이션 바에서 조회할 수 있는 최소 프로필 정보입니다.")
+    @GetMapping(value = "/my-minimal-profile")
+    public BaseResponse<GetMySemiProfileResponseDto> getMySemiProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return new BaseResponse<>(authService.getMyMinimalProfile(userDetails.getUserId()));
     }
 }

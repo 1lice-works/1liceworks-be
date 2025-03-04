@@ -1,11 +1,9 @@
 package com.elice.iliceworksbe.calendar.service;
 
+import com.elice.iliceworksbe.calendar.dto.request.*;
 import com.elice.iliceworksbe.calendar.dto.response.GetAccessibleCalendarsResponseDto;
 import com.elice.iliceworksbe.calendar.dto.response.GetCalendarEventsResponseDto;
-import com.elice.iliceworksbe.calendar.dto.request.PatchMyEventRequestDto;
-import com.elice.iliceworksbe.calendar.dto.request.PatchTeamEventRequestDto;
-import com.elice.iliceworksbe.calendar.dto.request.PostMyEventRequestDto;
-import com.elice.iliceworksbe.calendar.dto.request.PostTeamEventRequestDto;
+import com.elice.iliceworksbe.calendar.dto.response.GetEventsByTitleKeywordResponseDto;
 import com.elice.iliceworksbe.common.constant.CalendarType;
 
 import java.util.List;
@@ -26,6 +24,8 @@ public interface EventService {
 
     void patchTeamEvent(Long userId, Long calendarId, Long eventId, PatchTeamEventRequestDto patchTeamEventRequestDto);
     void patchMyEvent(Long userId, Long eventId, PatchMyEventRequestDto patchMyEventRequestDto);
+
+    GetEventsByTitleKeywordResponseDto getEventsByTitleKeyword(Long userId, GetEventsByTitleKeywordRequestDto getEventsByTitleKeywordRequestDto);
 
     List<EventJsonResponseDto> getEventsByDateAndParticipants(Long teamCalendarId, LocalDate date, List<Long> userIds);
 }

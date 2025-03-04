@@ -153,6 +153,10 @@ public class WebhookServiceImpl implements WebhookService {
     @Transactional
     @Override
     public void deleteWebhook(Long webhookId) {
+        // 웹훅이 존재하는지 확인
+        Webhook findedWebhook = webhookRepository.findById(webhookId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_WEBHOOK));
+
         webhookRepository.deleteById(webhookId);
     }
 }

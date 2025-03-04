@@ -1,12 +1,10 @@
 package com.elice.iliceworksbe.calendar.web;
 
 import com.elice.iliceworksbe.auth.model.UserDetailsImpl;
+import com.elice.iliceworksbe.calendar.dto.request.*;
 import com.elice.iliceworksbe.calendar.dto.response.GetCalendarEventsResponseDto;
-import com.elice.iliceworksbe.calendar.dto.request.PatchMyEventRequestDto;
-import com.elice.iliceworksbe.calendar.dto.request.PatchTeamEventRequestDto;
-import com.elice.iliceworksbe.calendar.dto.request.PostMyEventRequestDto;
-import com.elice.iliceworksbe.calendar.dto.request.PostTeamEventRequestDto;
 import com.elice.iliceworksbe.calendar.dto.response.GetAccessibleCalendarsResponseDto;
+import com.elice.iliceworksbe.calendar.dto.response.GetEventsByTitleKeywordResponseDto;
 import com.elice.iliceworksbe.calendar.service.EventService;
 import com.elice.iliceworksbe.calendar.service.GoogleCalendarService;
 import com.elice.iliceworksbe.common.constant.CalendarType;
@@ -48,7 +46,7 @@ public class CalendarController {
     @Operation(summary = "내 캘린더 일정 생성", description = "해당하는 캘린더ID에서 내 일정을 생성합니다.")
     @PostMapping("/my-events")
     public BaseResponse<Void> postMyEvent(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                            @RequestBody PostMyEventRequestDto postMyEventRequestDto) {
+                                          @RequestBody PostMyEventRequestDto postMyEventRequestDto) {
 
         eventService.postMyEvent(userDetails.getUserId(), postMyEventRequestDto);
         return new BaseResponse<>(ErrorCode.NO_CONTENT);
@@ -62,9 +60,9 @@ public class CalendarController {
                                                                         @RequestParam int targetMonth,
                                                                         @RequestParam int targetYear,
                                                                         @PathVariable String calendarType
-                                                                        ) {
+    ) {
 
-        if (targetMonth > 12  || targetMonth < 1 || targetYear < 0) {
+        if (targetMonth > 12 || targetMonth < 1 || targetYear < 0) {
             throw new BaseException(ErrorCode.INVALID_DATE);
         }
 
@@ -109,7 +107,7 @@ public class CalendarController {
     @Operation(summary = "내 캘린더 일정 수정", description = "내 캘린더ID에서 내 일정을 수정합니다.")
     @PatchMapping("/my-events")
     public BaseResponse<Void> patchMyEvent(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                             @RequestParam Long eventId, @RequestBody PatchMyEventRequestDto patchMyEventRequestDto) {
+                                           @RequestParam Long eventId, @RequestBody PatchMyEventRequestDto patchMyEventRequestDto) {
 
         eventService.patchMyEvent(userDetails.getUserId(), eventId, patchMyEventRequestDto);
         return new BaseResponse<>(ErrorCode.NO_CONTENT);
@@ -131,4 +129,14 @@ public class CalendarController {
 
         return new BaseResponse<>(ErrorCode.NO_CONTENT);
     }
+    @Operation(summary = "일정 검색 기능", description = "선택된 캘린더 내에서 키워드를 포함하는 제목을 기준으로 일정 검색을 합니다.")
+    @GetMapping("/find-events")
+    public BaseResponse<GetEventsByTitleKeywordResponseDto> getEventsByTitleKeyword(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                                    @RequestBody GetEventsByTitleKeywordRequestDto getEventsByTitleKeywordRequestDto) {
+
+
+
+        return new BaseResponse<>(eventService.getEventsByTitleKeyword(userDetails.getUserId(), getEventsByTitleKeywordRequestDto));
+    }
+
 }

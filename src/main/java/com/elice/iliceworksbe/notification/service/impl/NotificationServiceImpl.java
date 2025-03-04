@@ -209,7 +209,8 @@ public class NotificationServiceImpl implements NotificationService {
      * @param requestDto
      * @return
      */
-    private NotificationResponseDto postNotification(NotificationRequestDto requestDto) {
+    @Override
+    public NotificationResponseDto postNotification(NotificationRequestDto requestDto) {
         User user = userRepository.findById(requestDto.userId())
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
 

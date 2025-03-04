@@ -107,6 +107,7 @@ public class DataLoader {
 
         User taeseungUser = User.builder()
                 .accountId("hi563@threadly.ilice-works.com")
+                .profileImage("https://d2u3dcdbebyaiu.cloudfront.net/uploads/atch_img/554/20a6459f319fff68f0f90ce8c62d9be0_res.jpeg")
                 .username("정태승")
                 .password(passwordEncoder.encode("!a12345678"))
                 .privateEmail("hi563@naver.com")
@@ -118,6 +119,7 @@ public class DataLoader {
 
         User kwanghoUser = User.builder()
                 .accountId("kwangho@threadly.ilice-works.com")
+                .profileImage("https://cdn-icons-png.flaticon.com/512/11820/11820363.png")
                 .username("명광호")
                 .password(passwordEncoder.encode("!a12345678"))
                 .privateEmail("kwangho@naver.com")
@@ -140,6 +142,7 @@ public class DataLoader {
 
         User hyerimUser = User.builder()
                 .accountId("hyerim@threadly.ilice-works.com")
+                .profileImage("https://cdn-icons-png.flaticon.com/512/3135/3135789.png")
                 .username("양혜림")
                 .password(passwordEncoder.encode("!a12345678"))
                 .privateEmail("hyerim@naver.com")
@@ -151,6 +154,7 @@ public class DataLoader {
 
         User kyungjunUser = User.builder()
                 .accountId("kyungjun@threadly.ilice-works.com")
+                .profileImage("https://cdn-icons-png.flaticon.com/256/11045/11045219.png")
                 .username("정경준")
                 .password(passwordEncoder.encode("!a12345678"))
                 .privateEmail("kyungjun@naver.com")

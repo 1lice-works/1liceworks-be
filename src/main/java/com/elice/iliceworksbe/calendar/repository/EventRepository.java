@@ -39,4 +39,20 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findEventsWithinThreeMonthsByCalendar(@Param("startDate") LocalDateTime startDate,
                                                       @Param("endDate") LocalDateTime endDate,
                                                       @Param("calendar") Calendar calendar);
+
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.title LIKE %:keyword% " +
+            "AND e.calendar = :calendar ")
+    List<Event> findByTitleContainingAndCalendar(
+            @Param("keyword") String keyword,
+            @Param("calendar") Calendar calendar);
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.title LIKE %:keyword% " +
+            "AND e.calendar = :calendar " +
+            "AND e.privacy <> 'PRIVATE'")
+    List<Event> findByTitleContainingAndCalendarAndNotPrivate(
+            @Param("keyword") String keyword,
+            @Param("calendar") Calendar calendar);
 }

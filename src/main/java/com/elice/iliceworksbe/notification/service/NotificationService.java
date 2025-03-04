@@ -12,5 +12,6 @@ public interface NotificationService {
     void disconnect(Long userId);
     void sendNotification(NotificationRequestDto notificationRequestDto);
     void updateNotificationStatus(Long notificationId, boolean isSent);
+    NotificationResponseDto postNotification(NotificationRequestDto requestDto);
     List<NotificationResponseDto> getNotifications(Long userId);
 }

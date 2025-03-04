@@ -2,8 +2,10 @@ package com.elice.iliceworksbe.calendar.service.impl;
 
 import com.elice.iliceworksbe.auth.entity.User;
 import com.elice.iliceworksbe.auth.repository.UserRepository;
+import com.elice.iliceworksbe.calendar.dto.request.*;
 import com.elice.iliceworksbe.calendar.dto.response.GetAccessibleCalendarsResponseDto;
 import com.elice.iliceworksbe.calendar.dto.response.GetCalendarEventsResponseDto;
+import com.elice.iliceworksbe.calendar.dto.response.GetEventsByTitleKeywordResponseDto;
 import com.elice.iliceworksbe.calendar.dto.request.PatchMyEventRequestDto;
 import com.elice.iliceworksbe.calendar.dto.request.PatchTeamEventRequestDto;
 import com.elice.iliceworksbe.calendar.dto.request.PostMyEventRequestDto;
@@ -35,6 +37,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -264,6 +267,43 @@ public class EventServiceImpl implements EventService {
                 .map(eR -> EventReminder.of(eR, myEvent))
                 .toList();
         eventReminderRepository.saveAll(eventReminders);
+    }
+
+    @Override
+    public GetEventsByTitleKeywordResponseDto getEventsByTitleKeyword(Long userId, GetEventsByTitleKeywordRequestDto getEventsByTitleKeywordRequestDto) {
+
+        // 1. 현재 유저의 팀 조회
+        Team team = getTeamByUserID(userId);
+
+        // 2. calendarId들로 calendar 조회
+        List<Calendar> calendars = calendarRepository.findAllById(getEventsByTitleKeywordRequestDto.calendarIds());
+
+        // 3. 해당 캘린더들이 해당 팀의 캘린더가 맞는지 조회
+        log.info("조회할 캘린더 개수 : {}", calendars.size());
+
+        for (Calendar calendar : calendars) {
+            if (!calendar.getTypeId().equals(-1L)) { // 법정공휴일 캘린더가 아닌 경우
+                if (!calendar.getTeam().equals(team)) {
+                    log.info("권한 없는 캘린더에 접근하려고 합니다.");
+                    throw new BaseException(ErrorCode.NOT_FOUND_CALENDAR);
+                }
+            }
+        }
+
+        // 4. 해당 키워드를 포함하는 캘린더의 모든 일정 조회 (가장 최신 순으로 정렬)
+        // 의문. 이런 경우 페이징을 어떻게 처리할 것인가?
+        List<Event> resultEvents = new ArrayList<>();
+        for (Calendar calendar : calendars) {
+            if (calendar.getType().equals(CalendarType.MEMBER) && calendar.getTypeId().equals(userId)) { // 조회하려는 캘린더가 자신의 캘린더인 경우
+                resultEvents.addAll(eventRepository.findByTitleContainingAndCalendar(getEventsByTitleKeywordRequestDto.keyword(), calendar));
+            } else {
+                resultEvents.addAll(eventRepository.findByTitleContainingAndCalendarAndNotPrivate(getEventsByTitleKeywordRequestDto.keyword(), calendar));
+            }
+        }
+
+        resultEvents = resultEvents.stream().sorted(Comparator.comparing(Event::getDtStartTime).reversed()).toList();
+
+        return GetEventsByTitleKeywordResponseDto.from(resultEvents);
     }
 
     private Team getTeamByUserID(Long userId) {
