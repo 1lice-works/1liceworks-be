@@ -9,15 +9,17 @@ public record GetAccessibleCalendarsResponseDto(
         String name,
         Long calendarId,
         CalendarType calendarType,
-        Long typeId
+        Long typeId,
+        boolean isMyCalendar
 ) {
 
-    public static GetAccessibleCalendarsResponseDto from(Calendar calendar){
+    public static GetAccessibleCalendarsResponseDto from(Calendar calendar, Long userId){
         return GetAccessibleCalendarsResponseDto.builder()
                 .name(calendar.getName())
                 .calendarId(calendar.getId())
                 .calendarType(calendar.getType())
                 .typeId(calendar.getTypeId())
+                .isMyCalendar(calendar.getType() == CalendarType.MEMBER && calendar.getTypeId().equals(userId))
                 .build();
     }
 

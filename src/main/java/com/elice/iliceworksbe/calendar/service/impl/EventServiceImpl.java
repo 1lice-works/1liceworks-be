@@ -433,7 +433,9 @@ public class EventServiceImpl implements EventService {
         allCalendars.addAll(teamAccessibleCalendars);
         allCalendars.addAll(otherCalendars);
 
-        return allCalendars.stream().map(GetAccessibleCalendarsResponseDto::from).toList();
+        return allCalendars.stream()
+                .map(calendar -> GetAccessibleCalendarsResponseDto.from(calendar, userId))
+                .toList();
     }
 
     private EventDateRange getEventDateRange(int targetMonth, int targetYear) {
