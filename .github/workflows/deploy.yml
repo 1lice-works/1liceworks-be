@@ -4,11 +4,6 @@ on:
   push:
     branches:
       - dev
-  pull_request:
-    branches:
-      - dev
-    types:
-      - closed
 
 jobs:
   deploy:
@@ -43,6 +38,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           source: "build/libs/*.jar"
           target: "/home/ubuntu/1liceworks-be/build/libs/"
 
@@ -52,6 +48,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/ubuntu/
             ./deploy.sh
