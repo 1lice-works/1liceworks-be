@@ -82,6 +82,13 @@ dependencies {
 
 }
 
+processResources {
+    from("src/main/resources") {
+        include "**/*.json" // JSON 파일 포함
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE  // 중복 방지
+    }
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
