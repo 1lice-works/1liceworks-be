@@ -1,9 +1,10 @@
 package com.elice.iliceworksbe.auth.filter;
 
-import com.elice.iliceworksbe.auth.dto.LoginRequestDTO;
+import com.elice.iliceworksbe.auth.dto.request.LoginRequestDto;
 import com.elice.iliceworksbe.auth.model.UserDetailsImpl;
 import com.elice.iliceworksbe.auth.utils.JwtTokenProvider;
 import com.elice.iliceworksbe.auth.utils.RefreshTokenProvider;
+import com.elice.iliceworksbe.notification.service.NotificationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,10 +25,13 @@ public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthentication
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenProvider refreshTokenProvider;
+    private final NotificationService notificationService;
 
-    public JwtLoginAuthenticationFilter(JwtTokenProvider jwtTokenProvider, RefreshTokenProvider refreshTokenProvider) {
+    public JwtLoginAuthenticationFilter(JwtTokenProvider jwtTokenProvider, RefreshTokenProvider refreshTokenProvider,
+                                        NotificationService notificationService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.refreshTokenProvider = refreshTokenProvider;
+        this.notificationService = notificationService;
         setFilterProcessesUrl("/api/auth/login"); // 로그인 경로 설정
     }
 
@@ -36,7 +40,7 @@ public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthentication
         log.info("JwtLoginAuthenticationFilter 필터 - attemptAuthentication");
         try {
             // 클라이언트에서 전송한 사용자 정보를 객체로 변환
-            LoginRequestDTO loginRequestDTO = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDTO.class);
+            LoginRequestDto loginRequestDTO = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDto.class);
 
             // AuthenticationManager가 이메일과 비밀번호를 검증할 수 있도록 검증용 토큰을 만듦.
             UsernamePasswordAuthenticationToken authenticationToken =
@@ -61,11 +65,14 @@ public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthentication
         UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
 
         // 토큰 발급
-        String accessToken = jwtTokenProvider.generateAccessToken(userDetails.getUsername(), userDetails.getUserId());
+        String accessToken = jwtTokenProvider.generateAccessToken(userDetails.getUsername(), userDetails.getUserId(), userDetails.getAuthorities());
         String refreshToken = refreshTokenProvider.createAndStoreRefreshToken(userDetails.getUserId());
 
         // 리프레시 토큰을 쿠키로 설정
         refreshTokenProvider.setRefreshTokenCookie(response, refreshToken);
+
+        notificationService.createEmitter(userDetails.getUserId());
+        log.info("User {}: SSE 연결 완료", userDetails.getUserId());
 
         // 액세스 토큰 JWT를 클라이언트에 반환
         response.setContentType("application/json");

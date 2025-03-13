@@ -1,6 +1,9 @@
 package com.elice.iliceworksbe.team.entity;
 
 import com.elice.iliceworksbe.common.entity.BaseEntity;
+import com.elice.iliceworksbe.team.constant.Industry;
+import com.elice.iliceworksbe.team.constant.Scale;
+import com.elice.iliceworksbe.team.dto.team.TeamInfoUpdateDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,12 +25,29 @@ public class Team extends BaseEntity {
     @Column(name = "team_id", nullable = false)
     private Long id;
 
-    @Column(name = "team_name")
+    @Column(name = "company_name", nullable = false)
+    private String companyName;
+
+    @Column(name = "team_name", nullable = false)
     private String teamName;
 
-    @Column(name = "domain_name")
+    @Column(name = "domain_name", nullable = false)
     private String domainName;
 
-    @Column(name = "account_id", nullable = false)
-    private String accountId;
+    @Column(name = "has_private_domain", nullable = false)
+    private Boolean hasPrivateDomain;
+
+    @Column(name = "industry", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Industry industry;
+
+    @Column(name = "scale", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Scale scale;
+
+    public void updateTeamInfo(TeamInfoUpdateDto teamInfoUpdateDto) {
+        if (teamInfoUpdateDto.teamName() != null) {
+            this.teamName = teamInfoUpdateDto.teamName();
+        }
+    }
 }

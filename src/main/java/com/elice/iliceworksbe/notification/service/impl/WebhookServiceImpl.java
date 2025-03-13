@@ -1,0 +1,162 @@
+package com.elice.iliceworksbe.notification.service.impl;
+
+import com.elice.iliceworksbe.auth.repository.UserRepository;
+import com.elice.iliceworksbe.calendar.entity.Calendar;
+import com.elice.iliceworksbe.calendar.repository.CalendarRepository;
+import com.elice.iliceworksbe.common.constant.CalendarType;
+import com.elice.iliceworksbe.common.exception.BaseException;
+import com.elice.iliceworksbe.common.exception.ErrorCode;
+import com.elice.iliceworksbe.notification.dto.request.WebhookMessageDto;
+import com.elice.iliceworksbe.notification.dto.request.WebhookRequestDto;
+import com.elice.iliceworksbe.notification.dto.request.WebhookUpdateDto;
+import com.elice.iliceworksbe.notification.dto.response.WebhookResponseDto;
+import com.elice.iliceworksbe.notification.entity.Webhook;
+import com.elice.iliceworksbe.notification.repository.WebhookRepository;
+import com.elice.iliceworksbe.notification.service.WebhookService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.springframework.http.*;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class WebhookServiceImpl implements WebhookService {
+    private final WebhookRepository webhookRepository;
+    private final CalendarRepository calendarRepository;
+    private final UserRepository userRepository;
+
+    /**
+     * 웹훅 등록
+     * @param userId
+     * @param requestDto
+     * @return
+     */
+    @Transactional
+    @Override
+    public WebhookResponseDto postWebhook(Long userId, WebhookRequestDto requestDto) {
+
+        // 1. calendar 조회
+        Calendar calendar = calendarRepository.findById(requestDto.calendarId())
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CALENDAR));
+        log.info("calendar의 typeId={}", calendar.getTypeId());
+
+        // 2. user의 team 조회
+        Long teamId = userRepository.findTeamIdByUserId(userId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_TEAM));
+        log.info("user의 teamId={}", teamId);
+
+        // 3. calendar의 type이 TEAM, typeId가 user가 속한 teamId인지 확인
+        if (!(calendar.getType().equals(CalendarType.TEAM) && calendar.getTypeId().equals(teamId))) {
+            throw new BaseException(ErrorCode.INVALID_AUTHORIZATION);
+        }
+
+        // 4. 중복 Webhook 체크
+        if (webhookRepository.findByCalendarId(calendar.getId()).isPresent()) {
+            throw new BaseException(ErrorCode.DUPLICATED_WEBHOOK);
+        }
+
+        Webhook webhook = Webhook.from(requestDto);
+        webhook.assignCalendar(calendar);
+
+        Webhook savedWebhook = webhookRepository.save(webhook);
+        return WebhookResponseDto.from(savedWebhook);
+    }
+
+    /**
+     * 웹훅 전송
+     * @param calendarId
+     * @param webhookMessageDto
+     * @return
+     */
+    @Retryable(recover = "recover",
+                 backoff = @Backoff(delay = 2000))  //3번 재시도
+    @Override
+    public boolean sendWebhookMessage(Long calendarId, WebhookMessageDto webhookMessageDto) {
+
+        //calendarId로 webhook 조회
+        Webhook webhook = webhookRepository.findByCalendarId(calendarId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_WEBHOOK));
+
+        String payloadUrl = webhook.getPayloadUrl();
+        String contentType = webhook.getContentType().getValue();
+        log.info("시도 횟수 : {}", RetrySynchronizationManager.getContext().getRetryCount() + 1);
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) { // HttpClient 생성
+            HttpPost httpPost = new HttpPost(payloadUrl);
+            httpPost.setHeader("Content-Type", contentType + "; charset=UTF-8");
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            // WebhookMessageDto를 JSON으로 변환
+            String jsonPayload = objectMapper.writeValueAsString(webhookMessageDto);
+            httpPost.setEntity(new StringEntity(jsonPayload, "UTF-8"));
+
+            // HTTP 요청 실행
+            try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+
+                // response에 대한 처리
+                if (statusCode != HttpStatus.NO_CONTENT.value()) {
+                    log.error("메시지 전송 실패, 응답 코드: {}", statusCode);
+                    log.error("응답 내용: {}", EntityUtils.toString(response.getEntity()));
+                    throw new BaseException(ErrorCode.FAILED_TO_SEND_WEBHOOK);
+                }
+            }
+        } catch (Exception e) {
+            log.error("에러 발생: {}", e.getMessage());
+            throw new BaseException(ErrorCode.FAILED_TO_SEND_WEBHOOK);
+        }
+        return true;
+    }
+
+    /**
+     * 재시도 실패 후 실행되는 메서드
+     */
+    @Recover
+    public boolean recover(BaseException e, Long calendarId, WebhookMessageDto webhookMessageDto) {
+        log.error("재시도 실패 후 복구 실행: {}", e.getMessage());
+        return false;  // 최종 실패 처리
+    }
+
+    @Override
+    public WebhookResponseDto getWebhook(Long webhookId) {
+        Webhook findedWebhook = webhookRepository.findById(webhookId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_WEBHOOK));
+        return WebhookResponseDto.from(findedWebhook);
+    }
+
+    @Transactional
+    @Override
+    public WebhookResponseDto patchWebhook(Long webhookId, WebhookUpdateDto webhookUpdateDto) {
+        Webhook findedWebhook = webhookRepository.findById(webhookId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_WEBHOOK));
+        findedWebhook.update(webhookUpdateDto);
+
+        Webhook updatedWebhook = webhookRepository.save(findedWebhook);
+        return WebhookResponseDto.from(updatedWebhook);
+    }
+
+    @Transactional
+    @Override
+    public void deleteWebhook(Long webhookId) {
+        // 웹훅이 존재하는지 확인
+        Webhook findedWebhook = webhookRepository.findById(webhookId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_WEBHOOK));
+
+        webhookRepository.deleteById(webhookId);
+    }
+}

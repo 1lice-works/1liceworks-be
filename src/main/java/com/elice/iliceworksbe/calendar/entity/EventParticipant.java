@@ -30,4 +30,11 @@ public class EventParticipant extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public static EventParticipant of(Event event, User user) {
+        return EventParticipant.builder()
+                .event(event)
+                .user(user)
+                .build();
+    }
 }

@@ -15,5 +15,6 @@ public interface AuthTokenRepository extends JpaRepository<AuthToken, Long> {
     @Query("SELECT a FROM AuthToken a JOIN FETCH a.user WHERE a.refreshToken = :token")
     Optional<AuthToken> findByTokenWithUser(@Param("token") String token);
     Optional<AuthToken> findAuthTokenByUser(User user);
+    void deleteByRefreshToken(String refreshToken);
 
 }

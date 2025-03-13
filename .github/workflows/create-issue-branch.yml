@@ -1,0 +1,19 @@
+name: Create Issue Branch
+
+on:
+  issues:
+    types: [assigned]  # 올바르게 들여쓰기 수정
+
+jobs:
+  create_issue_branch_job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create Issue Branch
+        id: create_branch  # ID 추가 (outputs를 참조하기 위해 필요)
+        uses: robvanderleek/create-issue-branch@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Echo branch name
+        run: echo ${{ steps.create_branch.outputs.branchName }}  # 올바른 ID로 수정

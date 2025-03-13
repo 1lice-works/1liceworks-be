@@ -1,6 +1,8 @@
 package com.elice.iliceworksbe.team.entity;
 
 import com.elice.iliceworksbe.common.entity.BaseEntity;
+import com.elice.iliceworksbe.team.dto.position.PositionRequestDto;
+import com.elice.iliceworksbe.team.dto.position.PositionUpdateDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +26,14 @@ public class Position extends BaseEntity{
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    public void update(PositionUpdateDto positionUpdateDto) {
+        this.name = positionUpdateDto.name();
+    }
+
+    public static Position from(PositionRequestDto requestDto) {
+        return Position.builder()
+                .name(requestDto.name())
+                .build();
+    }
 }
