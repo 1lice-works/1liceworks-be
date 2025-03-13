@@ -32,6 +32,16 @@ jobs:
         run: |
           ./gradlew build -x test
 
+      - name: Remove old files from server
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            rm -rf /home/ubuntu/1liceworks-be
+
       - name: Copy Files to Server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -41,6 +51,7 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           source: "build/libs/*.jar"
           target: "/home/ubuntu/1liceworks-be/build/libs/"
+          strip_components: 1
 
       - name: Deploy on Server
         uses: appleboy/ssh-action@v0.1.7
