@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 /*
 서버 데이터 초기화용
@@ -297,8 +296,8 @@ public class DataLoader {
         Event ev2BE = Event.builder()
                 .title("백엔드 기술 공유 세션")
                 .description("새로운 기술 트렌드에 대한 논의")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 3, 5, 14, 0))
+                .dtEndTime(LocalDateTime.of(2025, 3, 5, 16, 0))
                 .isAllDay(false)
                 .privacy(PrivacyType.PUBLIC)
                 .availability(Availability.BUSY)
@@ -309,8 +308,8 @@ public class DataLoader {
         Event ev3BE = Event.builder()
                 .title("팀 점심 회식")
                 .description("올해의 성과를 기념하는 식사")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 2, 20, 12, 30))
+                .dtEndTime(LocalDateTime.of(2025, 2, 20, 14, 0))
                 .isAllDay(false)
                 .privacy(PrivacyType.PRIVATE)
                 .availability(Availability.FREE)
@@ -321,8 +320,8 @@ public class DataLoader {
         Event ev1FE = Event.builder()
                 .title("FE-BE 협업 미팅")
                 .description("API 스펙 조율 및 개선 논의")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 1, 21, 10, 0))
+                .dtEndTime(LocalDateTime.of(2025, 1, 21, 12, 0))
                 .isAllDay(false)
                 .privacy(PrivacyType.PUBLIC)
                 .availability(Availability.BUSY)
@@ -333,8 +332,8 @@ public class DataLoader {
         Event ev4BE = Event.builder()
                 .title("시스템 모니터링 점검")
                 .description("서버 성능 및 로그 분석")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 4, 10, 16, 30))
+                .dtEndTime(LocalDateTime.of(2025, 4, 10, 18, 30))
                 .isAllDay(false)
                 .privacy(PrivacyType.PUBLIC)
                 .availability(Availability.BUSY)
@@ -345,8 +344,8 @@ public class DataLoader {
         Event ev1Taeseung = Event.builder()
                 .title("팀 리더 전략 회의")
                 .description("다음 분기 목표 설정")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 1, 16, 11, 0))
+                .dtEndTime(LocalDateTime.of(2025, 1, 16, 13, 0))
                 .isAllDay(false)
                 .privacy(PrivacyType.PRIVATE)
                 .availability(Availability.BUSY)
@@ -357,8 +356,8 @@ public class DataLoader {
         Event ev5BE = Event.builder()
                 .title("개발자 커뮤니티 밋업")
                 .description("기술 공유 및 네트워킹")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 3, 8, 19, 0))
+                .dtEndTime(LocalDateTime.of(2025, 3, 8, 21, 0))
                 .isAllDay(false)
                 .privacy(PrivacyType.PUBLIC)
                 .availability(Availability.FREE)
@@ -369,8 +368,8 @@ public class DataLoader {
         Event ev6BE = Event.builder()
                 .title("DB 성능 최적화 세미나")
                 .description("데이터베이스 인덱싱 및 쿼리 튜닝")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 4, 2, 15, 0))
+                .dtEndTime(LocalDateTime.of(2025, 4, 2, 17, 0))
                 .isAllDay(false)
                 .privacy(PrivacyType.PUBLIC)
                 .availability(Availability.BUSY)
@@ -381,8 +380,8 @@ public class DataLoader {
         Event ev7BE = Event.builder()
                 .title("팀원 1:1 면담")
                 .description("개발 진행 상황 체크 및 피드백")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 2, 12, 14, 0))
+                .dtEndTime(LocalDateTime.of(2025, 2, 12, 15, 30))
                 .isAllDay(false)
                 .privacy(PrivacyType.PRIVATE)
                 .availability(Availability.BUSY)
@@ -393,8 +392,8 @@ public class DataLoader {
         Event ev2FE = Event.builder()
                 .title("UI/UX 개선 논의")
                 .description("디자인 시스템 및 피드백 반영")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 3, 3, 9, 30))
+                .dtEndTime(LocalDateTime.of(2025, 3, 3, 11, 30))
                 .isAllDay(false)
                 .privacy(PrivacyType.PUBLIC)
                 .availability(Availability.BUSY)
@@ -405,8 +404,8 @@ public class DataLoader {
         Event ev1kwangho = Event.builder()
                 .title("치과 가기")
                 .description("보라치과")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 1, 25, 10, 0))
+                .dtEndTime(LocalDateTime.of(2025, 1, 25, 11, 30))
                 .isAllDay(false)
                 .privacy(PrivacyType.PUBLIC)
                 .availability(Availability.BUSY)
@@ -417,8 +416,8 @@ public class DataLoader {
         Event ev2kwangho = Event.builder()
                 .title("건강검진")
                 .description("정기 건강검진")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 2, 14, 8, 30))
+                .dtEndTime(LocalDateTime.of(2025, 2, 14, 10, 30))
                 .isAllDay(false)
                 .privacy(PrivacyType.PRIVATE)
                 .availability(Availability.BUSY)
@@ -429,8 +428,8 @@ public class DataLoader {
         Event ev3kwangho = Event.builder()
                 .title("자격증 시험")
                 .description("정보처리기사 실기 시험")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 3, 15, 13, 0))
+                .dtEndTime(LocalDateTime.of(2025, 3, 15, 15, 30))
                 .isAllDay(false)
                 .privacy(PrivacyType.PUBLIC)
                 .availability(Availability.BUSY)
@@ -441,14 +440,16 @@ public class DataLoader {
         Event ev4kwangho = Event.builder()
                 .title("친구 결혼식")
                 .description("대학교 동기 결혼식")
-                .dtStartTime(getRandomDateTime())
-                .dtEndTime(getRandomDateTime())
+                .dtStartTime(LocalDateTime.of(2025, 4, 5, 12, 0))
+                .dtEndTime(LocalDateTime.of(2025, 4, 5, 14, 0))
                 .isAllDay(false)
                 .privacy(PrivacyType.PUBLIC)
                 .availability(Availability.FREE)
                 .location("서울 신라호텔")
                 .calendar(calendarKwangho)
                 .build();
+
+
 
         // 이벤트 저장
         List<Event> events = List.of(ev1BE, ev2BE, ev3BE, ev1FE, ev4BE, ev1Taeseung, ev5BE, ev6BE, ev7BE, ev2FE,
@@ -461,14 +462,39 @@ public class DataLoader {
                 .user(taeseungUser)
                 .build();
 
+        EventParticipant ep1_1 = EventParticipant.builder()
+                .event(ev1BE)
+                .user(kwanghoUser)
+                .build();
+
         EventParticipant ep2 = EventParticipant.builder()
                 .event(ev2BE)
                 .user(taeseungUser)
                 .build();
 
+        EventParticipant ep2_1 = EventParticipant.builder()
+                .event(ev2BE)
+                .user(kwanghoUser)
+                .build();
+
+        EventParticipant ep2_2 = EventParticipant.builder()
+                .event(ev2BE)
+                .user(soogyeongUser)
+                .build();
+
         EventParticipant ep3 = EventParticipant.builder()
                 .event(ev3BE)
                 .user(taeseungUser)
+                .build();
+
+        EventParticipant ep3_1 = EventParticipant.builder()
+                .event(ev3BE)
+                .user(kwanghoUser)
+                .build();
+
+        EventParticipant ep3_2 = EventParticipant.builder()
+                .event(ev3BE)
+                .user(soogyeongUser)
                 .build();
 
         EventParticipant ep4 = EventParticipant.builder()
@@ -526,7 +552,7 @@ public class DataLoader {
                 .user(kwanghoUser)
                 .build();
 
-        eventParticipantRepository.saveAll(List.of(ep1, ep2, ep3, ep4, ep5, ep6, ep7, ep8, ep9, ep10, ep11, ep12, ep13, ep14));
+        eventParticipantRepository.saveAll(List.of(ep1, ep1_1, ep2, ep2_1, ep2_2, ep3, ep3_1, ep3_2, ep4, ep5, ep6, ep7, ep8, ep9, ep10, ep11, ep12, ep13, ep14));
 
         //이벤트 리마인더 저장
         EventReminder ev1BE_er1 = EventReminder.builder()
@@ -611,12 +637,4 @@ public class DataLoader {
 
     }
 
-
-    // 2024년 12월부터 2025년 3월 사이의 무작위 값 설정
-    private LocalDateTime getRandomDateTime() {
-        long startEpoch = LocalDateTime.of(2024, 12, 1, 0, 0).toEpochSecond(java.time.ZoneOffset.UTC);
-        long endEpoch = LocalDateTime.of(2025, 2, 28, 23, 59).toEpochSecond(java.time.ZoneOffset.UTC);
-        long randomEpoch = ThreadLocalRandom.current().nextLong(startEpoch, endEpoch);
-        return LocalDateTime.ofEpochSecond(randomEpoch, 0, java.time.ZoneOffset.UTC);
-    }
 }
