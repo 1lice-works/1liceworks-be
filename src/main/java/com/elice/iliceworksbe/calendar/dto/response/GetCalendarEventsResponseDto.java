@@ -1,6 +1,7 @@
 package com.elice.iliceworksbe.calendar.dto.response;
 
 import com.elice.iliceworksbe.calendar.entity.Event;
+import com.elice.iliceworksbe.calendar.entity.EventParticipant;
 import com.elice.iliceworksbe.common.constant.Availability;
 import com.elice.iliceworksbe.common.constant.PrivacyType;
 import lombok.Builder;
@@ -23,7 +24,8 @@ public record GetCalendarEventsResponseDto(
         Boolean isAllDay,
         PrivacyType privacyType,
         Availability availability,
-        String location
+        String location,
+        List<Long> participants
     ){
         public static EventDto fromForMember(Event event){
 
@@ -39,6 +41,22 @@ public record GetCalendarEventsResponseDto(
             }
 
             return from(event);
+        }
+
+        public static EventDto fromForTeam(Event event, List<EventParticipant> eps){
+
+            return EventDto.builder()
+                    .eventId(event.getId())
+                    .title(event.getTitle())
+                    .description(event.getDescription())
+                    .dtStartTime(event.getDtStartTime())
+                    .dtEndTime(event.getDtEndTime())
+                    .isAllDay(event.getIsAllDay())
+                    .privacyType(event.getPrivacy())
+                    .availability(event.getAvailability())
+                    .location(event.getLocation())
+                    .participants(eps.stream().map(ep -> ep.getUser().getId()).toList())
+                    .build();
         }
 
         public static EventDto from(Event event){

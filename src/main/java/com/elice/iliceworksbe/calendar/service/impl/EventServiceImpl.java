@@ -122,13 +122,11 @@ public class EventServiceImpl implements EventService {
         );
 
         // 7. 해당 팀의 웹훅이 존재한다면 해당 팀의 웹훅에 일정이 생성됨을 알림
-        webhookRepository.findByCalendarId(calendarId).ifPresent(webhook -> {
-            webhookService.sendWebhookMessage(calendarId,
-                    WebhookMessageDto.builder()
-                            .content(NotificationMessages.CREATE_TEAM.getMessage())
-                            .build()
-            );
-        });
+        webhookRepository.findByCalendarId(calendarId).ifPresent(webhook -> webhookService.sendWebhookMessage(calendarId,
+                WebhookMessageDto.builder()
+                        .content(NotificationMessages.CREATE_TEAM.getMessage())
+                        .build()
+        ));
     }
 
     @Override
@@ -185,7 +183,7 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public void deleteMyEvent(Long userId, Long eventId) {
         // 1. 현재 유저의 캘린더 조회
-        User currentUser = userRepository.findById(userId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
+        userRepository.findById(userId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_USER));
         Calendar myCalendar = calendarRepository.findByTypeAndTypeId(CalendarType.MEMBER, userId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CALENDAR));
 
@@ -408,8 +406,16 @@ public class EventServiceImpl implements EventService {
                 // 3. targetYear와 targetMonth를 기준으로 앞뒤로 1개월씩에 해당하는 모든 Event 조회
                 List<Event> teamEvents = eventRepository.findEventsWithinThreeMonthsByCalendar(eventDateRange.startDateTime, eventDateRange.endDateTime, targetCalendar);
 
-                // 4. 변환 후 전달
-                return new GetCalendarEventsResponseDto(calendarId, teamEvents.stream().map(GetCalendarEventsResponseDto.EventDto::from).toList());
+                // 4. 각 Event 마다의 EventParticipants 찾기
+                List<GetCalendarEventsResponseDto.EventDto> eventDtos = new ArrayList<>();
+
+                for(Event e : teamEvents){
+                    List<EventParticipant> eps = eventParticipantRepository.findByEventId(e.getId());
+                    eventDtos.add(GetCalendarEventsResponseDto.EventDto.fromForTeam(e, eps));
+                }
+
+                // 5. 변환 후 전달
+                return new GetCalendarEventsResponseDto(calendarId, eventDtos);
 
             case OTHER:
                 log.info("Get Other Calendar");
@@ -482,11 +488,6 @@ public class EventServiceImpl implements EventService {
                 teamCalendarId, userIds, startDateTime, endDateTime
         );
 
-        if (events.isEmpty()) {
-            log.info("events size: {}", events.size());
-        }
-
-        List<EventJsonResponseDto> eventJsonResponseDtos = events.stream().map(EventJsonResponseDto::from).collect(Collectors.toList());
-        return eventJsonResponseDtos;
+        return events.stream().map(EventJsonResponseDto::from).collect(Collectors.toList());
     }
 }
