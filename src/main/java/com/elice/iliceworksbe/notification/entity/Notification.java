@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "notifications") // MongoDB 컬렉션 이름 지정
+@Document(collection = "notifications")
 public class Notification extends MongoBaseEntity {
 
     @Id
-    private String id; // MongoDB에서는 기본적으로 String(ObjectId) 사용
+    private String id;
 
     @Field(name = "message")
     private String message;

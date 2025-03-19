@@ -7,6 +7,7 @@ import com.elice.iliceworksbe.notification.repository.mongo.NotificationReposito
 import com.elice.iliceworksbe.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -114,6 +115,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     /**
      * 읽지 않은 알림 존재 여부 전송
+     *
      * @param userId
      * @param emitter
      */
@@ -234,8 +236,12 @@ public class NotificationServiceImpl implements NotificationService {
         //isRead = false인 알림 업데이트
         markAllAsReadByUserId(userId);
 
-        return notificationRepository.findTop50ByUserIdAndCreatedAtAfterOrderByCreatedAtDesc(userId, oneMonthAgo)
-                .stream()
+        // 최신 알림 최대 50개 조회
+        List<Notification> recentNotifications = findRecentNotifications(userId, oneMonthAgo, 50);
+
+        log.info("알림 개수 = {}", recentNotifications.size());
+
+        return recentNotifications.stream()
                 .map(NotificationResponseDto::from)
                 .collect(Collectors.toList());
     }
@@ -247,4 +253,16 @@ public class NotificationServiceImpl implements NotificationService {
         mongoTemplate.updateMulti(query, update, Notification.class);
     }
 
+    private List<Notification> findRecentNotifications(String userId, LocalDateTime fromDate, int limit) {
+
+        Criteria criteria = new Criteria()
+                .and("userId").is(userId)
+                .and("notifyTime").gte(fromDate);
+
+        Query query = new Query(criteria)
+                .with(Sort.by(Sort.Direction.DESC, "createdAt"))
+                .limit(limit);
+
+        return mongoTemplate.find(query, Notification.class);
+    }
 }
