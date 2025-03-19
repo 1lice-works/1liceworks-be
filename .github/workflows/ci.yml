@@ -26,6 +26,7 @@ jobs:
 
       - name: Restore application-test.yml
         run: |
+          mkdir -p src/test/resources
           echo "${{ secrets.APP_TEST_YML }}" > src/test/resources/application-test.yml
 
       - name: Restore serviceAccountKey.json
