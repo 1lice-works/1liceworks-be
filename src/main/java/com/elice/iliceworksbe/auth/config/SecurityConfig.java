@@ -81,6 +81,8 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:3000"); // 클라이언트 도메인에 해당하는 cors 설정
         config.addAllowedOrigin("http://localhost:5173");
+        config.addAllowedOrigin("http://125.208.118.7:9090"); // Prometheus 포트
+        config.addAllowedOrigin("http://125.208.118.7:9091"); // Grafana 포트
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
