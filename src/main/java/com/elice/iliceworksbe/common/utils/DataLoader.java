@@ -565,36 +565,48 @@ public class DataLoader {
         Notification ev1BE_er1_noti = Notification.builder()
                 .message(ev1BE.getTitle())
                 .notifyTime(ev1BE_er1.getNotifyTime())
+                .calendarId(calendarBE.getId())
+                .eventId(ev1BE.getId())
                 .user(ep1.getUser())
                 .build();
 
         Notification ev1BE_er2_noti = Notification.builder()
                 .message(ev1BE.getTitle())
                 .notifyTime(ev1BE_er2.getNotifyTime())
+                .calendarId(calendarBE.getId())
+                .eventId(ev1BE.getId())
                 .user(ep1.getUser())
                 .build();
 
         Notification ev2BE_er1_noti = Notification.builder()
                 .message(ev2BE.getTitle())
                 .notifyTime(ev2BE_er1.getNotifyTime())
+                .calendarId(calendarBE.getId())
+                .eventId(ev2BE.getId())
                 .user(ep2.getUser())
                 .build();
 
         Notification ev1FE_er1_noti = Notification.builder()
                 .message(ev1FE.getTitle())
                 .notifyTime(ev1FE_er1.getNotifyTime())
+                .calendarId(calendarFE.getId())
+                .eventId(ev1FE.getId())
                 .user(ep4.getUser())
                 .build();
 
         Notification ev1FE_er2_noti = Notification.builder()
                 .message(ev1FE.getTitle())
                 .notifyTime(ev1FE_er2.getNotifyTime())
+                .calendarId(calendarFE.getId())
+                .eventId(ev1FE.getId())
                 .user(ep4.getUser())
                 .build();
 
         Notification ev1Taeseung_er1_noti = Notification.builder()
                 .message(ev1Taeseung.getTitle())
                 .notifyTime(ev1Taeseung_er1.getNotifyTime())
+                .calendarId(calendarTaeseung.getId())
+                .eventId(ev1Taeseung.getId())
                 .user(ep6.getUser())
                 .build();
 

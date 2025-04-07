@@ -3,13 +3,20 @@ package com.elice.iliceworksbe.notification.service.impl;
 
 import com.elice.iliceworksbe.auth.entity.User;
 import com.elice.iliceworksbe.auth.repository.UserRepository;
+import com.elice.iliceworksbe.calendar.entity.Calendar;
+import com.elice.iliceworksbe.calendar.entity.Event;
+import com.elice.iliceworksbe.calendar.repository.CalendarRepository;
+import com.elice.iliceworksbe.calendar.repository.EventRepository;
 import com.elice.iliceworksbe.common.exception.BaseException;
 import com.elice.iliceworksbe.common.exception.ErrorCode;
 import com.elice.iliceworksbe.notification.dto.request.NotificationRequestDto;
+import com.elice.iliceworksbe.notification.dto.request.WebhookMessageDto;
 import com.elice.iliceworksbe.notification.dto.response.NotificationResponseDto;
 import com.elice.iliceworksbe.notification.entity.Notification;
 import com.elice.iliceworksbe.notification.repository.NotificationRepository;
+import com.elice.iliceworksbe.notification.repository.WebhookRepository;
 import com.elice.iliceworksbe.notification.service.NotificationService;
+import com.elice.iliceworksbe.notification.service.WebhookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -31,6 +38,10 @@ import java.util.stream.Collectors;
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final EventRepository eventRepository;
+    private final CalendarRepository calendarRepository;
+    private final WebhookRepository webhookRepository;
+    private final WebhookService webhookService;
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     /**
@@ -174,6 +185,9 @@ public class NotificationServiceImpl implements NotificationService {
                 updateNotificationStatus(savedNotification.notificationId(), true);
                 log.info("SSE 알림 전송 완료: {}", savedNotification.message());
 
+                // 5. 웹훅 보내기
+                sendTeamCalendarWebhook(requestDto.calendarId(), requestDto.message());
+
             } catch (IOException | IllegalStateException e) {
                 log.warn("실시간 알림 발송 실패: {}", e.getMessage());
                 emitters.remove(requestDto.userId(), emitter);
@@ -181,6 +195,14 @@ public class NotificationServiceImpl implements NotificationService {
         } else {
             log.info("사용자가 현재 SSE 구독 중이 아님, 로그인 후 알림 확인 가능");
         }
+    }
+
+    public void sendTeamCalendarWebhook(Long calendarId, String message){
+        webhookRepository.findByCalendarId(calendarId).ifPresent(webhook -> webhookService.sendWebhookMessage(calendarId,
+                WebhookMessageDto.builder()
+                        .content(message)
+                        .build()
+        ));
     }
 
     @Override
@@ -218,7 +240,14 @@ public class NotificationServiceImpl implements NotificationService {
         notification.assignUser(user);
 
         Notification savedNotification = notificationRepository.save(notification);
-        return NotificationResponseDto.from(savedNotification);
+
+        Event event = eventRepository.findById(requestDto.eventId()).orElse(null);
+        Calendar calendar = calendarRepository.findById(requestDto.calendarId()).orElse(null);
+
+        return NotificationResponseDto.from(savedNotification,
+                (event != null) ? event.getDtStartTime() : null,
+                (calendar != null) ? calendar.getType() : null
+        );
     }
 
     /**
@@ -237,8 +266,18 @@ public class NotificationServiceImpl implements NotificationService {
 
         return notificationRepository.findTop50ByUserIdAndCreatedAtAfterOrderByCreatedAtDesc(userId, oneMonthAgo)
                 .stream()
-                .map(NotificationResponseDto::from)
+                .map(this::mapToResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    private NotificationResponseDto mapToResponseDto(Notification notification) {
+        Event event = eventRepository.findById(notification.getEventId()).orElse(null);
+        Calendar calendar = calendarRepository.findById(notification.getCalendarId()).orElse(null);
+        return NotificationResponseDto.from(
+                notification,
+                (event != null) ? event.getDtStartTime() : null,
+                (calendar != null) ? calendar.getType() : null
+        );
     }
 
 }

@@ -43,10 +43,18 @@ public class Notification extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(name = "event_id")
+    private Long eventId;
+
+    @Column(name="calendar_id")
+    private Long calendarId;
+
     public static Notification from(NotificationRequestDto requestDto) {
         return Notification.builder()
                 .message(requestDto.message())
                 .notifyTime(LocalDateTime.now())
+                .eventId(requestDto.eventId())
+                .calendarId(requestDto.calendarId())
                 .build();
     }
 

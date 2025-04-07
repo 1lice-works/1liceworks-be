@@ -146,6 +146,7 @@ public class EventReminderServiceImpl implements EventReminderService {
         Long eventId = eventReminder.getEvent().getId();
         log.info("eventId", eventId);
         String message = "EventReminder : " + eventReminder.getEvent().getTitle();
+        Event event = findEventById(eventId);
 
         List<EventParticipant> participants = eventParticipantRepository.findByEventId(eventId);
         log.info("이벤트 '{}' 에 대한 참가자 수: {}", message, participants.size());
@@ -153,7 +154,12 @@ public class EventReminderServiceImpl implements EventReminderService {
         participants.forEach(participant -> {
             try {
                 log.info("알림 전송 - 사용자: {}", participant.getUser().getId());
-                NotificationRequestDto requestDto = new NotificationRequestDto(participant.getUser().getId(), message);
+                NotificationRequestDto requestDto = NotificationRequestDto.builder()
+                        .userId(participant.getUser().getId())
+                        .eventId(eventReminder.getEvent().getId())
+                        .calendarId(event.getCalendar().getId())
+                        .message(message)
+                        .build();
                 notificationService.sendNotification(requestDto);
             } catch (Exception e) {
                 log.error("알림 전송 실패 - 사용자: {}, 오류: {}", participant.getId(), e.getMessage(), e);

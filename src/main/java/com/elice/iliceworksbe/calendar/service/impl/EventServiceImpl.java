@@ -111,6 +111,8 @@ public class EventServiceImpl implements EventService {
                 m -> notificationService.sendNotification(
                         NotificationRequestDto.builder()
                                 .userId(m.getId())
+                                .eventId(teamEvent.getId())
+                                .calendarId(calendarId)
                                 .message(NotificationMessages.CREATE_TEAM.getMessage())
                                 .build()
                 )
